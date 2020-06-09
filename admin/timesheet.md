@@ -9,3 +9,4 @@
 | June 3 | Built JS code to print success/fail messages                   | 3h   | 16.5h      |
 | June 4 | Write Python code to save dir listing for JS element to grab   | 2h   | 18.5h      |
 | June 5 | Meet with Laura to discuss notebook layout                     | 0.5h | 19h        |
+| June 9 | edit existing patterns + bug fixes                             | 7h   | 26h        |
