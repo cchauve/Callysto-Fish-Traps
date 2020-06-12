@@ -11,4 +11,6 @@
 | June 5 | Meet with Laura to discuss notebook layout                     | 0.5h | 19h        |
 | June 8 | edit existing patterns + bug fixes                             | 7h   | 26h        |
 | June 9 | bug fixes, demo to Laura, Pull request                         | 3h   | 29h        |
-
+| June 10| Get new buttons styling to match existing, bug fixes           | 3h   | 32h        |
+| June 11| fix bug where user could try to created fractional sized array | 1h   | 33h        |
+| June 12| get 3d models to display from 3 angles                         | 3h   | 36h        |
