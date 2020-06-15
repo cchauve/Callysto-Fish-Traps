@@ -28,7 +28,7 @@ I plan to follow the format of the Basket Weaving project. First present informa
 2. I have used 36 hours so far on updating the Basket Weaving project;
 3. I will be splitting my time between this project and other comitments until 01 August 2020.
 
-###Questions:
+### Questions:
 1. What will Laura's role be moving forward?
 2. How many hours exactly am I aloted for this?
 ...* Confirm the final product is due before September?
