@@ -8,7 +8,7 @@ I(Bryce) plan on continuing to use python and jupyter notebooks while relying on
 Once an initial mathematical model is provided I see a few ways to “gamify” the learning.
 
 ### Idea 1: Build a trap without resources limitations
-User inputs dimensions + location of fish trap and depending on input they are told how many fish they catch that season or tidal shift. This is the simplest and most feasible.
+User inputs dimensions + location of the fish trap and depending on input they are told how many fish they catch that season or tidal shift. This is the simplest and most feasible.
 
 ### Idea 2: Build a trap with resource limitations
 Similar to idea one but the fish trap design is inhibited by some resource.
@@ -26,11 +26,11 @@ I plan to follow the format of the Basket Weaving project. First present informa
 ### Limitations:
 1. Animations, outside of the most trivial, will have to be out of scope. It would eat up all the hours.;
 2. I have used 36 hours so far on updating the Basket Weaving project;
-3. I will be splitting my time between this project and other comitments until 01 August 2020.
+3. I will be splitting my time between this project and other commitments until 01 August 2020.
 
-###Questions:
+### Questions:
 1. What will Laura's role be moving forward?
-2. How many hours exactly am I aloted for this?
+2. How many hours exactly am I allocated for this?
 ...* Confirm the final product is due before September?
 ...* What will be the plans for meetings going forward?
 ...* Should we have specific check ins when so many hours are used?
@@ -40,3 +40,5 @@ I plan to follow the format of the Basket Weaving project. First present informa
 For point 1: I suggest Laura continue in her current role providing me guidance as an end-user/educator/stake-holder through informal meetings.
 
 For point 2: My understanding is I will have 200 hours, I suggest we have some form of formal check in every 40 hours (every two weeks).
+
+
