@@ -15,3 +15,5 @@
 | June 11| fix bug where user could try to created fractional sized array | 1h   | 33h        |
 | June 12| get 3d models to display from 3 angles                         | 3h   | 36h        |
 | June 23| make three changes to salish baskets requested by Laura        | 3h   | 39h        |
+| June 24| modelling                                                      | 1h   | 40h        |
+| June 25| modelling                                                      |      |            | 
