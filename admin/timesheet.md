@@ -17,3 +17,5 @@
 | June 23| make three changes to salish baskets requested by Laura        | 3h   | 39h        |
 | June 24| modelling                                                      | 1h   | 40h        |
 | June 25| modelling                                                      | 4h   | 44h        |
+| June 30| modelling                                                      | 2h   | 46h        |
+| July 01| modelling                                                      | 2h   | 48h        |
