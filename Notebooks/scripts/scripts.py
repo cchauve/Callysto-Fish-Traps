@@ -30,7 +30,7 @@ def create_tide_plot():
     plt.savefig("tide.png")
     plt.show()
 
-def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius = 25: int, delta = 5: int) -> float:
+def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
 
     Args:
@@ -70,7 +70,7 @@ def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius = 25: i
     coverage  = angle/ (0.5 * np.pi)
     return coverage
 
-def get_perimeter(radius = 25: int, delta = 5: int, height = 2: float, slope = 0.17: float, intercept = 6: float):
+def get_perimeter(radius: int = 25, delta: int = 5, height: float = 2, slope: float = 0.17, intercept: float = 6):
     """Creates set of points at the top of the semi-circular trap
 
     Args:
@@ -96,7 +96,7 @@ def get_perimeter(radius = 25: int, delta = 5: int, height = 2: float, slope = 0
     return [x,y,z]
 
 
-def run_trap(tide_level: float, radius: int, delta = 5: int, harvesting = False: bool):
+def run_trap(tide_level: float, radius: int, delta: int = 5, harvesting: bool = False):
     """Runs the fish trap model for 1 week.
 
     Args:
