@@ -70,14 +70,15 @@ def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int = 
     coverage  = angle/ (0.5 * np.pi)
     return coverage
 
-def get_perimeter(radius: int = 25, delta: int = 5, height: float = 2, slope: float = 0.17, intercept: float = 6):
+def get_perimeter(radius: int = 25, height: float = 2, delta: int = 5, slope: float = 0.17, intercept: float = 6):
     """Creates set of points at the top of the semi-circular trap
 
     Args:
         radius: an integer value that sets the radius of the trap
+        height: the height from the beach surface to the top of the trap
         delta: how far down the y-axis the center of the circle is
         slope: the slope of the beach on which the trap is built
-        height: the height from the beach surface to the top of the trap
+        intercept: using mean sea level as zero, the intercept for the equation of the slope of the beac
     
     returns:
         the Perimter, a 2d array:
@@ -88,7 +89,7 @@ def get_perimeter(radius: int = 25, delta: int = 5, height: float = 2, slope: fl
     
     theta = np.linspace(0, np.pi, 100)
     #equation for a circle
-    x = radius* np.cos(theta)
+    x = radius * np.cos(theta)
     y = radius * np.sin(theta) + delta
     # equation for a line
     z = intercept + height - (slope * y)
@@ -96,11 +97,12 @@ def get_perimeter(radius: int = 25, delta: int = 5, height: float = 2, slope: fl
     return [x,y,z]
 
 
-def run_trap(radius: int = 25, delta: int = 5, constant_population: bool = True,  harvesting: bool = False):
+def run_trap(radius: int = 25, height: float = 2,  delta: int = 5, constant_population: bool = True,  harvesting: bool = False):
     """Runs the fish trap model for 1 week.
 
     Args:
         radius: the radius of the semi-circular trap created
+        height: the height of the trap
         delta: how far down the y axis the "center" of the semi-circle is from the origin
         constant_population: if true the population will reset to max_fish after every harvest, else it will decrease by the number of harvested fish
         harvesting: if true, user is prompted to harvest some fish at each low tide
@@ -110,6 +112,7 @@ def run_trap(radius: int = 25, delta: int = 5, constant_population: bool = True,
             [0]: The total number of harvested fish at hour indexed
             [1]: The total number of fish in the trap at hour at hour indexed
             [2]: the total number of fish outside the trap at hour indexed
+            [3]: list of the size of all harvests
     """
     movement_rate = 0.05
     max_fish = 1000
@@ -122,10 +125,10 @@ def run_trap(radius: int = 25, delta: int = 5, constant_population: bool = True,
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
     
-    perimeter = get_perimeter()
+    perimeter = get_perimeter(radius, height)
 
     for level in tide_values:
-        coverage = get_ratio_of_perimeter_covered(level, perimeter, radius = 25)
+        coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
         caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
         current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
@@ -136,19 +139,20 @@ def run_trap(radius: int = 25, delta: int = 5, constant_population: bool = True,
 
         else:
             total_harvested.append(total_harvested[-1] + current_caught_fish)
-            if (current_caught_fish != 0):
+            if(current_caught_fish != 0):
                 catches.append(current_caught_fish)
 
             current_caught_fish = 0
-            if(constant_population):
+
+            if(constant_population == True):
                 current_free_fish = max_fish
 
         in_trap.append(current_caught_fish)
         out_trap.append(current_free_fish)
 
-    return [total_harvested, in_trap, out_trap]
+    return [total_harvested, in_trap, out_trap, catches]
 
-def plot_trap(radius: int = 25, delta: int = 5,constant_population: bool = True, harvesting: bool = False):
+def plot_trap(radius: int = 25, height: float = 2, delta: int = 5, constant_population: bool = True, harvesting: bool = False):
     """Generates a plot for the fish trap operating over 1 week
 
     Args:
@@ -160,7 +164,7 @@ def plot_trap(radius: int = 25, delta: int = 5,constant_population: bool = True,
     seaborn.set()
     plt.style.use('seaborn-deep')
 
-    values = run_trap(radius, delta, harvesting)
+    values = run_trap(radius, height, delta, constant_population, harvesting)
 
     x_values = range(len(values[0]))
     plt.plot(x_values, values[1], label = "fish in trap")
