@@ -96,6 +96,34 @@ def get_perimeter(radius: int = 25, height: float = 2, delta: int = 5, slope: fl
 
     return [x,y,z]
 
+def get_harvest_input(fish_in_trap: int) -> int:
+    """function retrieves user input and checks the value. This number is to represent the number of fish harvested this tide cycle.
+    Args:
+        fish_in_trap: the current  number of fish in the trap
+
+    Returns:
+        a positive integer <= fish_in_trap
+    """
+
+    print(math.floor(fish_in_trap), "fish have been trapped.\n how many do you want to harvest? The rest will be released.")
+    harvest_raw = input()
+    try:
+        harvest_int = int(harvest_raw)
+        
+        if(harvest_int > fish_in_trap):
+            print("Enter a number that is no bigger than the number of the fish in the trap")
+            return(get_harvest_input(fish_in_trap))
+
+        if(harvest_int < 0):
+            print("Enter a non-zero number")
+            return(get_harvest_input(fish_in_trap))
+
+        return(harvest_int)
+
+    except ValueError:
+        print("Please enter a positive integer, such as:  0,1,2...");
+        return(get_harvest_input(fish_in_trap))
+        
 
 def run_trap(radius: int = 25, height: float = 2,  delta: int = 5, constant_population: bool = True,  harvesting: bool = False):
     """Runs the fish trap model for 1 week.
@@ -124,29 +152,41 @@ def run_trap(radius: int = 25, height: float = 2,  delta: int = 5, constant_popu
     catches = []
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
-    
+   
     perimeter = get_perimeter(radius, height)
-
+    #iterated through all tide levels recorded and run the model
     for level in tide_values:
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
         caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
         current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
         current_free_fish = current_free_fish + caught_to_free - free_to_caught
-
+        
+        #if the coverage is >0 then the fish arn't trapped so "nothing" happens
         if(coverage > 0):
             total_harvested.append(total_harvested[-1])
-
+        
         else:
-            total_harvested.append(total_harvested[-1] + current_caught_fish)
-            if(current_caught_fish != 0):
-                catches.append(current_caught_fish)
-
-            current_caught_fish = 0
+            #if harvesting and a whole fish is in the trap the user gets to decide to harvest or not
+            if(harvesting and math.floor(current_caught_fish) != 0):
+                selected_harvest = get_harvest_input(current_caught_fish)
+            else:
+                selected_harvest = math.floor(current_caught_fish)
+            
+            # regardless of if it was automatically selected or user selected we record the harvest level
+            total_harvested.append(total_harvested[-1] + selected_harvest)
+            
+            if(math.floor(current_caught_fish) != 0):
+                catches.append(selected_harvest)
 
             if(constant_population == True):
                 current_free_fish = max_fish
-
+            else:
+                current_free_fish = current_free_fish + (current_caught_fish - selected_harvest)
+            
+            # clear the traps
+            current_caught_fish = 0
+        
         in_trap.append(current_caught_fish)
         out_trap.append(current_free_fish)
 
