@@ -145,5 +145,26 @@ def run_trap(radius: int = 25, delta: int = 5, harvesting: bool = False):
 
     return [total_harvested, in_trap, out_trap]
 
-#def plot_trap():
+def plot_trap(radius: int = 25, delta: int = 5, harvesting: bool = False):
+    """Generates a plot for the fish trap operating over 1 week
+
+    Args:
+        radius: the radius of the semi-circular trap created
+        delta: how far down the y axis the "center" of the semi-circle is from the origin
+        harvesting: if true, user is prompted to harvest some fish at each low tide
+    """
+    seaborn.set()
+    plt.style.use('seaborn-deep')
+
+    values = run_trap(radius, delta, harvesting)
+
+    x_values = range(len(tide_values) + 1)
+    plt.plot(x_values, values[1], label = "fish in trap")
+    plt.plot(x_values, values[2], label = "fish outside of trap")
+    plt.plot(x_values, values[0], label = "total caught")
+    plt.ylabel("number of fish")
+    plt.xlabel("time (h)")
+    plt.title('fish')
+    plt.legend()
+    plt.show()
 
