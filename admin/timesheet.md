@@ -19,6 +19,7 @@
 | June 25| modelling                                                      | 4h   | 44h        |
 | June 30| modelling                                                      | 2h   | 46h        |
 | July 01| modelling                                                      | 2h   | 48h        |
-|July 03| updates from Thursdays meeting                                  | 2h   | 50h        |
-|July 6 | creating scirpts                                                | 1h   | 51h        |
-|July 7 | creating scripts                                                | 0.5h | 51.5h      |
+| July 03| updates from Thursdays meeting                                 | 2h   | 50h        |
+| July 6 | creating scirpts                                               | 1h   | 51h        |
+| July 7 | creating scripts                                               | 0.5h | 51.5h      |
+| July 8 | update scripts, harvesting feature intoduce widgets            | 5h   | 56.5h      |
