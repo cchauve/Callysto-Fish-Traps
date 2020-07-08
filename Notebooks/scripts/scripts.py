@@ -11,10 +11,10 @@ def get_tide_values():
     Returns:
         a dataframe containing measured tide values for comox"""
 
-    tide_path = os.path.join('..', 'resources', 'comox_tide.csv')
+    tide_path = os.path.join('resources', 'comox_tide.csv')
     tide_df = pd.read_csv(tide_path)
     tide_df = tide_df.drop(columns = ['PDT'])
-    return tide_df.flatten() 
+    return tide_df.values.flatten()
 
 def create_tide_plot():
     """Displays a plot of hourly tide levels for 1 week in May using readings from comox """
