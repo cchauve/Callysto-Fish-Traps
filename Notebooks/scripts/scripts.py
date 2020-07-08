@@ -96,11 +96,10 @@ def get_perimeter(radius: int = 25, delta: int = 5, height: float = 2, slope: fl
     return [x,y,z]
 
 
-def run_trap(tide_level: float, radius: int, delta: int = 5, harvesting: bool = False):
+def run_trap(radius: int = 25, delta: int = 5, harvesting: bool = False):
     """Runs the fish trap model for 1 week.
 
     Args:
-        tide_level: A tide level reading in meters above sea-level
         radius: the radius of the semi-circular trap created
         delta: how far down the y axis the "center" of the semi-circle is from the origin
         harvesting: if true, user is prompted to harvest some fish at each low tide
@@ -124,9 +123,9 @@ def run_trap(tide_level: float, radius: int, delta: int = 5, harvesting: bool = 
     perimeter = get_perimeter()
 
     for level in tide_values:
-        coverage = circ_covered(level, perimeter, radius = 25)
-        free_to_caught = free_fish * coverage * alpha * perimeter_ratio
-        caught_to_free = caught_fish * coverage * alpha * perimeter_ratio
+        coverage = get_ratio_of_perimeter_covered(level, perimeter, radius = 25)
+        free_to_caught = current_free_fish * coverage * alpha * perimeter_ratio
+        caught_to_free = current_caught_fish * coverage * alpha * perimeter_ratio
         current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
         current_free_fish = current_free_fish + caught_to_free - free_to_caught
 
@@ -145,3 +144,6 @@ def run_trap(tide_level: float, radius: int, delta: int = 5, harvesting: bool = 
         out_trap.append(current_free_fish)
 
     return [total_harvested, in_trap, out_trap]
+
+#def plot_trap():
+
