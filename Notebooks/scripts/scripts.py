@@ -30,6 +30,33 @@ def create_tide_plot():
     plt.savefig("tide.png")
     plt.show()
 
+#def get_equation_of_plane(x1,y1, z1, x2, y2, z2, x3, y3, z3):
+#    """Takes in three points and calculates the equation of the plane
+#
+#    returns [e, f, g] where these are the variables of: ex + fy + g = z"""
+#
+#    # Find two vectors using
+#    a1 = x2 - x1
+#    b1 = y2 - y1
+#    c1 = z2 - z1
+#    a2 = x3 - x1
+#    b2 = y3 - y1
+#    c2 = z3 - z1
+#
+#    # 
+#    a = b1 * c2 - b2 * c1
+#    b = a2 * c1 - a1 * c2
+#    c = a1 * b2 - b1 * a2
+#    d = (- a * x1 - b * y1 - c * z1)
+#
+#    e = a / c
+#    f = b / c
+#    g = d / c
+
+
+
+
+
 def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
 
@@ -125,12 +152,13 @@ def get_harvest_input(fish_in_trap: int) -> int:
         return(get_harvest_input(fish_in_trap))
         
 
-def run_trap(radius: int = 25, height: float = 2,  delta: int = 5, constant_population: bool = True,  harvesting: bool = False):
+def run_trap(radius: int = 25, height: float = 2, slope = 0.17, delta: int = 5, constant_population: bool = True,  harvesting: bool = False):
     """Runs the fish trap model for 1 week.
 
     Args:
         radius: the radius of the semi-circular trap created
         height: the height of the trap
+        slope: slope of the beach
         delta: how far down the y axis the "center" of the semi-circle is from the origin
         constant_population: if true the population will reset to max_fish after every harvest, else it will decrease by the number of harvested fish
         harvesting: if true, user is prompted to harvest some fish at each low tide
@@ -153,7 +181,7 @@ def run_trap(radius: int = 25, height: float = 2,  delta: int = 5, constant_popu
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
    
-    perimeter = get_perimeter(radius, height)
+    perimeter = get_perimeter(radius, height, slope)
     #iterated through all tide levels recorded and run the model
     for level in tide_values:
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
@@ -192,11 +220,13 @@ def run_trap(radius: int = 25, height: float = 2,  delta: int = 5, constant_popu
 
     return [total_harvested, in_trap, out_trap, catches]
 
-def plot_trap(radius: int = 25, height: float = 2, delta: int = 5, constant_population: bool = True, harvesting: bool = False):
+def plot_trap(radius: int = 25, height: float = 2, slope = 0.17, delta: int = 5, constant_population: bool = True, harvesting: bool = False):
     """Generates a plot for the fish trap operating over 1 week
 
     Args:
         radius: the radius of the semi-circular trap created
+        height: the height of the trap
+        slope: the slope of the beach
         delta: how far down the y axis the "center" of the semi-circle is from the origin
         constant_population: if true the population will reset to max_fish after every harvest, else it will decrease by the number of harvested fish
         harvesting: if true, user is prompted to harvest some fish at each low tide
