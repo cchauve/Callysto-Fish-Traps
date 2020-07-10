@@ -159,7 +159,7 @@ def get_harvest_input(fish_in_trap: int) -> int:
         print("Please enter a positive integer, such as:  0,1,2...");
         return(get_harvest_input(fish_in_trap))
 
-def run_trap_harvesting(prev_values, harvesting: int = 0, radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population:bool = True):
+def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population:bool = True):
     """Runs the model for one harvesting cycle. Where a harvesting cycle is period of time ending in the next low tide in which the trap is closed with fish inside.
     Args:
         prev_values is an array of arrays with:
@@ -169,7 +169,7 @@ def run_trap_harvesting(prev_values, harvesting: int = 0, radius: int = default_
             [3]: list of the size of all harvests
         The values in this array are the history of the model. if the model is being run from the start, pass in [].
         
-        harvesting: how many fish will be harvested this cycle. This is to be user selected
+        selected_harvest: how many fish will be harvested this cycle. This is to be user selected
         radius: the radius of the semi-circular trap created
         height: the height of the trap
         slope: slope of the beach
@@ -188,8 +188,8 @@ def run_trap_harvesting(prev_values, harvesting: int = 0, radius: int = default_
     Throws:
         ValueError if harvesting is not a positive integer <= the number of the fish in the trap
     """
-    movement_rate = 0.05
-    max_fish = 1000
+
+
     if(len(prev_values) == 0):
         current_free_fish = max_fish
         current_caught_fish = 0
@@ -202,11 +202,33 @@ def run_trap_harvesting(prev_values, harvesting: int = 0, radius: int = default_
         in_trap = prev_values[1]
         out_trap = prev_values[2]
         catches = prev_values[3]
+        current_free_fish = out_trap[-1]
+        current_caught_fish = in_trap[-1]
     
+        total_harvested.append(total_harvested[-1] + selected_harvest)
+        catches.append(selected_harvest)
+
+        if(constant_population):
+            current_free_fish = max_fish
+        else:
+            current_free_fish = current_free_fish + (current_caught_fish - selected_harvest)
+
+        #empty the traps and record the step after the selected harvest
+        current_caught_fish = 0
+        in_trap.append(current_caught_fish)
+        out_trap.append(current_free_fish)
+
+    
+    movement_rate = 0.05
+    max_fish = 1000
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
+    #drop tide values already ran
+    tide_values = tide_values[len(in_trap) - 1 : len(tide_values)]
     perimeter = get_perimeter(radius, height, slope)
     
+    for level in tide_values:
+
 
 
 
