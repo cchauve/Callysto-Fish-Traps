@@ -234,7 +234,7 @@ def plot_trap(radius: int = 25, height: float = 2, slope = 0.17, delta: int = 5,
     seaborn.set()
     plt.style.use('seaborn-deep')
 
-    values = run_trap(radius, height, delta, constant_population, harvesting)
+    values = run_trap(radius, height, slope, delta, constant_population, harvesting)
 
     x_values = range(len(values[0]))
     plt.plot(x_values, values[1], label = "fish in trap")
