@@ -22,4 +22,5 @@
 | July 03| updates from Thursdays meeting                                 | 2h   | 50h        |
 | July 6 | creating scirpts                                               | 1h   | 51h        |
 | July 7 | creating scripts                                               | 0.5h | 51.5h      |
-| July 8 | update scripts, harvesting feature intoduce widgets            | 5h   | 56.5h      |
+| July 8 | update scripts, harvesting feature built ipynb widgets         | 5h   | 56.5h      |
+| July 9 | meeting with laura, explore UI modify function inputs          | 6h   | 62.5h      |
