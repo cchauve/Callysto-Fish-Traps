@@ -6,6 +6,14 @@ import os
 import math
 from typing import List, Tuple
 
+
+# global variables that act as default values for the trap
+default_slope = 0.17
+default_inter = 6
+default_radius = 25
+default_height = 2
+default_delta = 5
+
 def get_tide_values():
     """Grabs the tide values measured for one week in comox
     Returns:
@@ -43,7 +51,7 @@ def create_tide_plot():
 #    b2 = y3 - y1
 #    c2 = z3 - z1
 #
-#    # 
+#   # find a,b,c, d from ax + by + cz = d
 #    a = b1 * c2 - b2 * c1
 #    b = a2 * c1 - a1 * c2
 #    c = a1 * b2 - b1 * a2
@@ -97,7 +105,7 @@ def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int = 
     coverage  = angle/ (0.5 * np.pi)
     return coverage
 
-def get_perimeter(radius: int = 25, height: float = 2, delta: int = 5, slope: float = 0.17, intercept: float = 6):
+def get_perimeter(radius: int = default_radius, height: float = default_height, delta: int = default_delta, slope: float = default_slope, intercept: float = default_inter):
     """Creates set of points at the top of the semi-circular trap
 
     Args:
@@ -150,18 +158,68 @@ def get_harvest_input(fish_in_trap: int) -> int:
     except ValueError:
         print("Please enter a positive integer, such as:  0,1,2...");
         return(get_harvest_input(fish_in_trap))
+
+def run_trap_harvesting(prev_values, harvesting: int = 0, radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population:bool = True):
+    """Runs the model for one harvesting cycle. Where a harvesting cycle is period of time ending in the next low tide in which the trap is closed with fish inside.
+    Args:
+        prev_values is an array of arrays with:
+            [0]: The total number of harvested fish at hour indexed
+            [1]: The total number of fish in the trap at hour at hour indexed
+            [2]: the total number of fish outside the trap at hour indexed
+            [3]: list of the size of all harvests
+        The values in this array are the history of the model. if the model is being run from the start, pass in [].
         
+        harvesting: how many fish will be harvested this cycle. This is to be user selected
+        radius: the radius of the semi-circular trap created
+        height: the height of the trap
+        slope: slope of the beach
+        delta: how far down the y axis the "center" of the semi-circle is from the origin
+        constant_population: if true the population will reset to max_fish after every harvest, else it will decrease by the number of harvested fish
 
-def run_trap(radius: int = 25, height: float = 2, slope = 0.17, delta: int = 5, constant_population: bool = True,  harvesting: bool = False):
+    Returns:
+        An 2d array containing:
+            [0]: The total number of harvested fish at hour indexed
+            [1]: The total number of fish in the trap at hour at hour indexed
+            [2]: the total number of fish outside the trap at hour indexed
+            [3]: list of the size of all harvests
+            [4]: a boolean showing if the model is completed
+        This returned array is shows one more cycle of harvesting than the inputed one.
+        
+    Throws:
+        ValueError if harvesting is not a positive integer <= the number of the fish in the trap
+    """
+    movement_rate = 0.05
+    max_fish = 1000
+    if(len(prev_values) == 0):
+        current_free_fish = max_fish
+        current_caught_fish = 0
+        total_harvested = [0]
+        in_trap = [0]
+        out_trap = [max_fish]
+        catches = []
+    else:
+        total_harvested = prev_values[0]
+        in_trap = prev_values[1]
+        out_trap = prev_values[2]
+        catches = prev_values[3]
+    
+    perimeter_ratio = (np.pi * radius) / (np.pi * 25)
+    tide_values = get_tide_values()
+    perimeter = get_perimeter(radius, height, slope)
+    
+
+
+
+
+def run_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
     """Runs the fish trap model for 1 week.
-
+    
     Args:
         radius: the radius of the semi-circular trap created
         height: the height of the trap
         slope: slope of the beach
         delta: how far down the y axis the "center" of the semi-circle is from the origin
         constant_population: if true the population will reset to max_fish after every harvest, else it will decrease by the number of harvested fish
-        harvesting: if true, user is prompted to harvest some fish at each low tide
 
     Returns:
         An 2d array containing:
@@ -220,7 +278,7 @@ def run_trap(radius: int = 25, height: float = 2, slope = 0.17, delta: int = 5, 
 
     return [total_harvested, in_trap, out_trap, catches]
 
-def plot_trap(radius: int = 25, height: float = 2, slope = 0.17, delta: int = 5, constant_population: bool = True, harvesting: bool = False):
+def plot_trap(radius: int = default_radius, height: float = default_height, slope = default_slope, delta: int = default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
 
     Args:
@@ -229,12 +287,11 @@ def plot_trap(radius: int = 25, height: float = 2, slope = 0.17, delta: int = 5,
         slope: the slope of the beach
         delta: how far down the y axis the "center" of the semi-circle is from the origin
         constant_population: if true the population will reset to max_fish after every harvest, else it will decrease by the number of harvested fish
-        harvesting: if true, user is prompted to harvest some fish at each low tide
     """
     seaborn.set()
     plt.style.use('seaborn-deep')
 
-    values = run_trap(radius, height, slope, delta, constant_population, harvesting)
+    values = run_trap(radius, height, slope, delta, constant_population)
 
     x_values = range(len(values[0]))
     plt.plot(x_values, values[1], label = "fish in trap")
