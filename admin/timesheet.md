@@ -24,3 +24,4 @@
 | July 7 | creating scripts                                               | 0.5h | 51.5h      |
 | July 8 | update scripts, harvesting feature built ipynb widgets         | 5h   | 56.5h      |
 | July 9 | meeting with laura, explore UI modify function inputs          | 6h   | 62.5h      |
+| July 10| meeting, re-factor step wise function call                     | 8h   | 70.5h      |

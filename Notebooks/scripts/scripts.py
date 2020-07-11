@@ -226,6 +226,10 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
             [3]: list of the size of all harvests
     """
     movement_rate = 0.05
+    #TODO:
+    # Add a new rate out_variable that is dependent on the volume of water in the trap
+    # was looking into: https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.dblquad.html
+    # to calculate the volume but a rough approximation would probably do.
     max_fish = 1000
     current_free_fish = max_fish
     current_caught_fish = 0
@@ -241,6 +245,8 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
     for level in tide_values:
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
+        #TODO:
+        # the caught_to_free variable should depend on the new calculated variable discussed above
         caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
         current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
         current_free_fish = current_free_fish + caught_to_free - free_to_caught
