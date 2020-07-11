@@ -133,13 +133,14 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     Throws:
         ValueError if harvesting is not a positive integer <= the number of the fish in the trap
     """
+
     movement_rate = 0.05
     max_fish = 1000
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
     perimeter = get_perimeter(radius, height, delta, slope)
 #TODO
-#check that the parameters, specifically selected_harvest, are within range and throw an error if they are not
+#check that all the user inputs are within reasonable bounds or throw an error if they are not
     if(len(prev_values) == 0):
         #if the model is just starting
         current_free_fish = max_fish
@@ -157,6 +158,17 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
         catches = prev_values[3]
         current_free_fish = out_trap[-1]
         current_caught_fish = in_trap[-1]
+
+    try:
+       selected_harvest = int(selected_harvest)
+    except ValueError:
+        raise ValueError("selected_harvest must be a positive integer not larger than the number of fish in the trap")
+
+    if(selected_harvest > current_caught_fish or selected_harvest < 0):
+        raise ValueError("selected_harvest must be a positive integer not larger than the number of fish in the trap")
+
+
+
     
         catches.append(selected_harvest)
 
@@ -262,6 +274,28 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
 
     return [total_harvested, in_trap, out_trap, catches]
 
+def plot_values(values):
+    """give the data for the trap, create a plot
+
+    Args:
+        data_arr is an array of arrays:
+            [0]: The total number of harvested fish at hour indexed
+            [1]: The total number of fish in the trap at hour at hour indexed
+            [2]: the total number of fish outside the trap at hour indexed
+    """
+    seaborn.set()
+    plt.style.use('seaborn-deep')
+    
+    x_values = range(len(values[0]))
+    plt.plot(x_values, values[1], label = "fish in trap")
+    plt.plot(x_values, values[2], label = "fish outside of trap")
+    plt.plot(x_values, values[0], label = "total caught")
+    plt.ylabel("number of fish")
+    plt.xlabel("time (h)")
+    plt.title('fish')
+    plt.legend()
+    plt.show()
+
 def plot_trap(radius: int = default_radius, height: float = default_height, slope = default_slope, delta: int = default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
 
@@ -272,18 +306,8 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
         delta: how far down the y axis the "center" of the semi-circle is from the origin
         constant_population: if true the population will reset to max_fish after every harvest, else it will decrease by the number of harvested fish
     """
-    seaborn.set()
-    plt.style.use('seaborn-deep')
 
     values = run_trap(radius, height, slope, delta, constant_population)
+    plot_values(values)
 
-    x_values = range(len(values[0]))
-    plt.plot(x_values, values[1], label = "fish in trap")
-    plt.plot(x_values, values[2], label = "fish outside of trap")
-    plt.plot(x_values, values[0], label = "total caught")
-    plt.ylabel("number of fish")
-    plt.xlabel("time (h)")
-    plt.title('fish')
-    plt.legend()
-    plt.show()
 
