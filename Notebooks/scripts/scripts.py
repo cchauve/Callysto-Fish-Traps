@@ -133,7 +133,13 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     Throws:
         ValueError if harvesting is not a positive integer <= the number of the fish in the trap
     """
-
+    movement_rate = 0.05
+    max_fish = 1000
+    perimeter_ratio = (np.pi * radius) / (np.pi * 25)
+    tide_values = get_tide_values()
+    perimeter = get_perimeter(radius, height, delta, slope)
+#TODO
+#check that the parameters, specifically selected_harvest, are within range and throw an error if they are not
     if(len(prev_values) == 0):
         #if the model is just starting
         current_free_fish = max_fish
@@ -153,6 +159,8 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
         current_caught_fish = in_trap[-1]
     
         catches.append(selected_harvest)
+
+        level = tide_values[len(results[1]) - 2]
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
         caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
@@ -170,15 +178,9 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
         in_trap.append(current_caught_fish)
         out_trap.append(current_free_fish)
 
-    
-    movement_rate = 0.05
-    max_fish = 1000
-    perimeter_ratio = (np.pi * radius) / (np.pi * 25)
-    tide_values = get_tide_values()
     #drop tide values already ran
     tide_values = tide_values[len(in_trap) - 1 : len(tide_values)]
-    perimeter = get_perimeter(radius, height, slope)
-    
+
     for level in tide_values:
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         
@@ -225,7 +227,7 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
    
-    perimeter = get_perimeter(radius, height, slope)
+    perimeter = get_perimeter(radius, height, delta, slope)
     #iterated through all tide levels recorded and run the model
     for level in tide_values:
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
