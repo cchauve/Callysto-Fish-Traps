@@ -38,33 +38,6 @@ def create_tide_plot():
     plt.savefig("tide.png")
     plt.show()
 
-#def get_equation_of_plane(x1,y1, z1, x2, y2, z2, x3, y3, z3):
-#    """Takes in three points and calculates the equation of the plane
-#
-#    returns [e, f, g] where these are the variables of: ex + fy + g = z"""
-#
-#    # Find two vectors using
-#    a1 = x2 - x1
-#    b1 = y2 - y1
-#    c1 = z2 - z1
-#    a2 = x3 - x1
-#    b2 = y3 - y1
-#    c2 = z3 - z1
-#
-#   # find a,b,c, d from ax + by + cz = d
-#    a = b1 * c2 - b2 * c1
-#    b = a2 * c1 - a1 * c2
-#    c = a1 * b2 - b1 * a2
-#    d = (- a * x1 - b * y1 - c * z1)
-#
-#    e = a / c
-#    f = b / c
-#    g = d / c
-
-
-
-
-
 def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
 
@@ -131,34 +104,6 @@ def get_perimeter(radius: int = default_radius, height: float = default_height, 
 
     return [x,y,z]
 
-def get_harvest_input(fish_in_trap: int) -> int:
-    """function retrieves user input and checks the value. This number is to represent the number of fish harvested this tide cycle.
-    Args:
-        fish_in_trap: the current  number of fish in the trap
-
-    Returns:
-        a positive integer <= fish_in_trap
-    """
-
-    print(math.floor(fish_in_trap), "fish have been trapped.\n how many do you want to harvest? The rest will be released.")
-    harvest_raw = input()
-    try:
-        harvest_int = int(harvest_raw)
-        
-        if(harvest_int > fish_in_trap):
-            print("Enter a number that is no bigger than the number of the fish in the trap")
-            return(get_harvest_input(fish_in_trap))
-
-        if(harvest_int < 0):
-            print("Enter a non-zero number")
-            return(get_harvest_input(fish_in_trap))
-
-        return(harvest_int)
-
-    except ValueError:
-        print("Please enter a positive integer, such as:  0,1,2...");
-        return(get_harvest_input(fish_in_trap))
-
 def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population:bool = True):
     """Runs the model for one harvesting cycle. Where a harvesting cycle is period of time ending in the next low tide in which the trap is closed with fish inside.
     Args:
@@ -189,15 +134,17 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
         ValueError if harvesting is not a positive integer <= the number of the fish in the trap
     """
 
-
     if(len(prev_values) == 0):
+        #if the model is just starting
         current_free_fish = max_fish
         current_caught_fish = 0
         total_harvested = [0]
         in_trap = [0]
         out_trap = [max_fish]
         catches = []
+    
     else:
+        #update the model with the harvest the user selected
         total_harvested = prev_values[0]
         in_trap = prev_values[1]
         out_trap = prev_values[2]
@@ -205,14 +152,19 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
         current_free_fish = out_trap[-1]
         current_caught_fish = in_trap[-1]
     
-        total_harvested.append(total_harvested[-1] + selected_harvest)
         catches.append(selected_harvest)
+        coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
+        free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
+        caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
+        current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
+        current_free_fish = current_free_fish + caught_to_free - free_to_caught
 
         if(constant_population):
             current_free_fish = max_fish
         else:
             current_free_fish = current_free_fish + (current_caught_fish - selected_harvest)
 
+        total_harvested.append(total_harvested[-1] + selected_harvest)
         #empty the traps and record the step after the selected harvest
         current_caught_fish = 0
         in_trap.append(current_caught_fish)
@@ -228,9 +180,21 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     perimeter = get_perimeter(radius, height, slope)
     
     for level in tide_values:
-
-
-
+        coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
+        
+        if(math.floor(current_caught_fish) != 0 and coverage == 0):
+            return [total_harvested, in_trap, out_trap, catches, False]
+        
+        free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
+        caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
+        current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
+        current_free_fish = current_free_fish + caught_to_free - free_to_caught
+        
+        total_harvested.append(total_harvested[-1])
+        in_trap.append(current_caught_fish)
+        out_trap.append(current_free_fish)
+   
+    return [total_harvested, in_trap, out_trap, catches, True]
 
 
 def run_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
@@ -275,11 +239,7 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
             total_harvested.append(total_harvested[-1])
         
         else:
-            #if harvesting and a whole fish is in the trap the user gets to decide to harvest or not
-            if(harvesting and math.floor(current_caught_fish) != 0):
-                selected_harvest = get_harvest_input(current_caught_fish)
-            else:
-                selected_harvest = math.floor(current_caught_fish)
+            selected_harvest = math.floor(current_caught_fish)
             
             # regardless of if it was automatically selected or user selected we record the harvest level
             total_harvested.append(total_harvested[-1] + selected_harvest)
