@@ -7,7 +7,7 @@ import math
 from typing import List, Tuple
 
 
-# global variables that act as default values for the trap
+# global variables that act as default values for the trap inputs
 default_slope = 0.17
 default_inter = 6
 default_radius = 25
@@ -167,9 +167,6 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     if(selected_harvest > current_caught_fish or selected_harvest < 0):
         raise ValueError("selected_harvest must be a positive integer not larger than the number of fish in the trap")
 
-
-
-    
         catches.append(selected_harvest)
 
         level = tide_values[len(results[1]) - 2]
@@ -309,5 +306,3 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
 
     values = run_trap(radius, height, slope, delta, constant_population)
     plot_values(values)
-
-
