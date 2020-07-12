@@ -25,3 +25,4 @@
 | July 8 | update scripts, harvesting feature built ipynb widgets         | 5h   | 56.5h      |
 | July 9 | meeting with laura, explore UI modify function inputs          | 6h   | 62.5h      |
 | July 10| meeting, re-factor step wise function call                     | 8h   | 70.5h      |
+| July 11| issue 5, debug stepwise model                                  | 1h   | 71.5h      |
