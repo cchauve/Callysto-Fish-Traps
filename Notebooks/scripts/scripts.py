@@ -158,18 +158,18 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
         catches = prev_values[3]
         current_free_fish = out_trap[-1]
         current_caught_fish = in_trap[-1]
+    
+        try:
+            selected_harvest = int(selected_harvest)
+        except ValueError:
+            raise ValueError("selected_harvest must be a positive integer not larger than the number of fish in the trap")
 
-    try:
-       selected_harvest = int(selected_harvest)
-    except ValueError:
-        raise ValueError("selected_harvest must be a positive integer not larger than the number of fish in the trap")
-
-    if(selected_harvest > current_caught_fish or selected_harvest < 0):
-        raise ValueError("selected_harvest must be a positive integer not larger than the number of fish in the trap")
+        if(selected_harvest > current_caught_fish or selected_harvest < 0):
+            raise ValueError("selected_harvest must be a positive integer not larger than the number of fish in the trap")
 
         catches.append(selected_harvest)
 
-        level = tide_values[len(results[1]) - 2]
+        level = tide_values[len(in_trap) - 1]
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
         caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
@@ -299,7 +299,7 @@ def plot_values(values):
     plt.legend()
     plt.show()
 
-def plot_trap(radius: int = default_radius, height: float = default_height, slope = default_slope, delta: int = default_delta, constant_population: bool = True):
+def plot_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
 
     Args:
