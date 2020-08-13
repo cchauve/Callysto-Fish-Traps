@@ -26,3 +26,9 @@
 | July 9 | meeting with laura, explore UI modify function inputs          | 6h   | 62.5h      |
 | July 10| meeting, re-factor step wise function call                     | 8h   | 70.5h      |
 | July 11| issue 5, debug stepwise model                                  | 1h   | 71.5h      |
+| Aug 6  | meeting and bug fix                                            | 4h   | 75.5h      |
+| Aug 7  | issue 5, fix bug (whitespace error)                            | 4h   | 79.5h      |
+| Aug 10 | laura meeting, issue 3                                         | 4h   | 83.5h      |
+| Aug 11 | issue 3                                                        | 4h   | 87.5h      |
+| Aug 12 | issue 3                                                        | 4h   | 91.5h      |
+| Aug 12 | meeting, issue 3                                               | 4h   | 95.5h      |
