@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn
-import os
+import os,sys
 import math
 from typing import List, Tuple
-
+import plotly.express as px
 
 # global variables that act as default values for the trap inputs
 default_slope = 0.17
@@ -24,19 +24,52 @@ def get_tide_values():
     tide_df = tide_df.drop(columns = ['PDT'])
     return tide_df.values.flatten()
 
-def create_tide_plot():
-    """Displays a plot of hourly tide levels for 1 week in May using readings from comox """
-    tide_values = get_tide_values()
+def create_tide_plot(option):
+    """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
+    Args:
     
-    seaborn.set()
-    plt.style.use('seaborn-deep')
-    x = range(len(tide_values))
-    plt.plot(x, tide_values)
-    plt.ylabel("tide level (m above sea level)")
-    plt.xlabel("time (h)")
-    plt.title('tide levels for one week in Comox Harbour')
-    plt.savefig("tide.png")
-    plt.show()
+    option: a string containing the word 'day' or 'week'
+    if 'day' is passed a plot with a single day tide measurements will be passed
+    if 'week' is passed a plot with a week tide measurements will be passed
+    
+    This function creates an interactive plot indicating min and max tide values,
+    as well as the time when they happened.
+    """
+    
+    try:
+        tide_values = get_tide_values()
+
+        x = range(len(tide_values))
+
+        time = np.array(range(len(tide_values)))
+
+        if option.lower()=="day":
+            tide_values = tide_values[0:24]
+            days = time%24
+            fig = px.line(y=tide_values[0:24],x=days[0:24],labels={"x":"time (h)","y":"tide level (m above sea level)"},
+                         title='Tide levels for one day in Comox Harbour')
+            
+        
+        elif option.lower()=="week":
+            tide_values = tide_values
+            days = time
+            fig = px.line(y=tide_values,x=days,labels={"x":"time (h)","y":"tide level (m above sea level)"},
+                         title='Tide levels for one week in Comox Harbour')
+            
+        else:
+            print("Error, expected a string with eithe 'day' or 'week'")
+            sys.exit(0)
+            
+        # Print min and max
+        result_min = np.where(tide_values == min(tide_values))
+        result_max = np.where(tide_values == max(tide_values))
+        print("The lowest tide reaches", min(tide_values),"meters at",result_min[0][0],"hours")
+        print("The highest tide reaches", max(tide_values),"meters at",result_max[0][0],"hours")
+        
+        fig.show()
+        
+    except:
+        print("WARNING: expected 'day' or 'week' as an option. Ensure you are passing a single variable of type string")
 
 def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
