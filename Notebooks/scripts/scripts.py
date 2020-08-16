@@ -5,7 +5,7 @@ import seaborn
 import os
 import math
 from typing import List, Tuple
-
+import plotly.express as px
 
 # global variables that act as default values for the trap inputs
 default_slope = 0.17
@@ -24,7 +24,40 @@ def get_tide_values():
     tide_df = tide_df.drop(columns = ['PDT'])
     return tide_df.values.flatten()
 
-def create_tide_plot():
+def create_tide_plot(timeframe="week", day=1):
+    """Displays a plot of hourly tide levels for 1 week in May using readings from comox """
+   
+    tide_df = pd.DataFrame(get_tide_values())
+    tide_df = tide_df.rename(columns = {0:'tide_level'})
+    tide_df['hour'] = tide_df.index
+    tide_df["day_hour"] = tide_df["hour"] % 24
+    tide_df["day"] = tide_df['hour'] // 24
+
+    if(timeframe == "week"):
+        fig = px.line(tide_df, x="hour", y="tide_level", line_shape='spline')
+        fig.update_traces(text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+                        hovertemplate='%{text}<br>%{y:}m above sea-level')
+        fig.update_layout(title='Measured Tide Readings for Comox Harbour',
+                    xaxis_title = 'Time (Days Since Start)',
+                    yaxis_title = 'Tide Level (Meters Above Sea Level)',
+                    xaxis = dict(tickvals = tide_df.day.unique() * 24,
+                                    ticktext = tide_df.day.unique()))
+
+    elif(timeframe == "day" and 0 <= day and 7 >= day):
+        tide_df = tide_df[tide_df.day == day]
+        fig = px.line(tide_df, x="day_hour", y="tide_level", line_shape='spline')
+        fig.update_layout(title='Measured Tide Readings for Comox Harbour',
+                    xaxis_title = 'Time (Hours)',
+                    yaxis_title = 'Tide Level (Meters Above Sea Level)')
+        fig.update_traces(text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+                        hovertemplate='%{text}<br>%{y:}m above sea-level')
+    else:
+        raise ValueError("kwarg 'timeframe' must be 'day' or 'week'. kwarg 'day' must be  between 0-7")
+
+
+    fig.show()
+
+def create_tide_plot2():
     """Displays a plot of hourly tide levels for 1 week in May using readings from comox """
     tide_values = get_tide_values()
     
