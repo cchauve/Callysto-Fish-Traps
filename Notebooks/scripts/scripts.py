@@ -363,7 +363,13 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
     """
 
     values = run_trap(radius, height, slope, delta, constant_population)
-    plot_values(values)
+    
+    ## Build data structure 
+    fish_simulation = {"Total harvested fish":values[0],
+                        "Total fish in the trap":values[1],
+                        "Total fish outside the trap":values[2]}
+    
+    plot_values(fish_simulation)
     
 def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
     # Initial coordinates 
