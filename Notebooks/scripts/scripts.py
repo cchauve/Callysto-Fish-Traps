@@ -365,7 +365,7 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
     values = run_trap(radius, height, slope, delta, constant_population)
     plot_values(values)
     
-def plot_interactive_map(latitude,longitude):
+def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
     # Initial coordinates 
     SC_COORDINATES = [latitude, longitude]
 
@@ -375,7 +375,7 @@ def plot_interactive_map(latitude,longitude):
     marker_cluster = MarkerCluster().add_to(map_osm)
     folium.Marker(location = [SC_COORDINATES[0],SC_COORDINATES[1]], 
                       # Add tree name
-                      popup=folium.Popup("Comox Valley Harbour",sticky=True),
+                      popup=folium.Popup(tag,sticky=True),
                         tooltip='Click here to hide/reveal name',
                       #Make color/style changes here
                       icon=folium.Icon(color='red', icon='anchor', prefix='fa'),
