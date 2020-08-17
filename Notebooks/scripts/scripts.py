@@ -43,7 +43,7 @@ def create_tide_plot(timeframe="week", day=1):
                     xaxis = dict(tickvals = tide_df.day.unique() * 24,
                                     ticktext = tide_df.day.unique()))
 
-    elif(timeframe == "day" and 0 <= day and 7 >= day):
+    elif(timeframe == "day" and 0 <= day and 6 >= day):
         tide_df = tide_df[tide_df.day == day]
         fig = px.line(tide_df, x="day_hour", y="tide_level", line_shape='spline')
         fig.update_layout(title='Measured Tide Readings for Comox Harbour',
@@ -52,24 +52,9 @@ def create_tide_plot(timeframe="week", day=1):
         fig.update_traces(text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
                         hovertemplate='%{text}<br>%{y:}m above sea-level')
     else:
-        raise ValueError("kwarg 'timeframe' must be 'day' or 'week'. kwarg 'day' must be  between 0-7")
-
+        raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
 
     fig.show()
-
-def create_tide_plot2():
-    """Displays a plot of hourly tide levels for 1 week in May using readings from comox """
-    tide_values = get_tide_values()
-    
-    seaborn.set()
-    plt.style.use('seaborn-deep')
-    x = range(len(tide_values))
-    plt.plot(x, tide_values)
-    plt.ylabel("tide level (m above sea level)")
-    plt.xlabel("time (h)")
-    plt.title('tide levels for one week in Comox Harbour')
-    plt.savefig("tide.png")
-    plt.show()
 
 def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
@@ -319,18 +304,25 @@ def plot_values(values):
             [1]: The total number of fish in the trap at hour at hour indexed
             [2]: the total number of fish outside the trap at hour indexed
     """
-    seaborn.set()
-    plt.style.use('seaborn-deep')
-    
-    x_values = range(len(values[0]))
-    plt.plot(x_values, values[1], label = "fish in trap")
-    plt.plot(x_values, values[2], label = "fish outside of trap")
-    plt.plot(x_values, values[0], label = "total caught")
-    plt.ylabel("number of fish")
-    plt.xlabel("time (h)")
-    plt.title('fish')
-    plt.legend()
-    plt.show()
+    df = pd.DataFrame(values).transpose()
+    df.columns=['Total Harvested', 'In Trap', 'Out of Trap', 'harvest_sizes']
+    df = df.drop(['harvest_sizes'], axis=1)
+    df['hour'] = df.index
+    df['In Area'] = df.apply(lambda x: x['In Trap'] + x['Out of Trap'], axis=1)
+    df = df.melt(id_vars=['hour'], value_vars = ['In Trap', 'Out of Trap', 'Total Harvested', 'In Area'])
+    df['value'] = df['value'].round()
+    df = df.rename(columns={"value": "fish", "variable": "category"})
+
+    fig = px.line(df, x='hour', y='fish', color='category', title="Fish Levels Throughout Harvesting")
+
+    fig.update_traces(hovertemplate=None)
+
+    fig.update_layout(hovermode="x",
+                  yaxis_title="Number of Fish",
+                 xaxis_title="Time(Hours Since Start)")
+
+    fig.show()
+
 
 def plot_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
