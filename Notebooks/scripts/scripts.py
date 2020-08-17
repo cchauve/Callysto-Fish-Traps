@@ -8,6 +8,8 @@ from typing import List, Tuple
 import plotly.express as px
 import folium
 from folium.plugins import MarkerCluster
+import plotly.graph_objs as go
+
 
 # global variables that act as default values for the trap inputs
 default_slope = 0.17
@@ -321,7 +323,37 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
 
     return [total_harvested, in_trap, out_trap, catches]
 
+
+def generate_df_from_simulation(fish_simulation):
+    
+    """give the data for the trap, create a plot
+    Args:
+        fish_simulation is a dictionary with three keys for fish which are either harvested, in the trap 
+        and out of the trap, whose values are arrays from our simulation
+        
+    fish_simulation = {"Total harvested fish":current_results[0],
+    "Total fish in the trap":current_results[1],
+    "Total fish outside the trap":current_results[2]}
+    
+    Usage generate_df_from_simulation(fish_simulation)
+    """
+    df = pd.DataFrame(fish_simulation)
+    
+    df.columns=['Total Harvested', 'In Trap', 'Out of Trap']
+    df['hour'] = df.index
+    df['In Area'] = df.apply(lambda x: x['In Trap'] + x['Out of Trap'], axis=1)
+
+    df['day'] = df['hour']//24
+    df['day_hour'] = df['hour']%24
+    df['In Trap'] = df['In Trap'].round()
+    return df
+
+def plot_caught_fish_vs_tide(fish_simulation):
+    
+    df = generate_df_from_simulation(fish_simulation)
+    
 def plot_values(fish_simulation):
+    
     """give the data for the trap, create a plot
     Args:
         fish_simulation is a dictionary with three keys for fish which are either harvested, in the trap 
@@ -333,13 +365,14 @@ def plot_values(fish_simulation):
     
     Usage plot_values(fish_simulation)
     """
-    df = pd.DataFrame(fish_simulation)
-    df.columns=['Total Harvested', 'In Trap', 'Out of Trap']
-    df['hour'] = df.index
-    df['In Area'] = df.apply(lambda x: x['In Trap'] + x['Out of Trap'], axis=1)
+    
+    df = generate_df_from_simulation(fish_simulation)
+    # Manipulate DF a bit more
     df = df.melt(id_vars=['hour'], value_vars = ['In Trap', 'Out of Trap', 'Total Harvested', 'In Area'])
     df['value'] = df['value'].round()
     df = df.rename(columns={"value": "fish", "variable": "category"})
+    
+    display(df.head)
 
     fig = px.line(df, x='hour', y='fish', color='category', title="Fish Levels Throughout Harvesting")
 
@@ -349,6 +382,22 @@ def plot_values(fish_simulation):
                   yaxis_title="Number of Fish",
                  xaxis_title="Time(Hours Since Start)")
 
+    fig.show()
+    
+def plot_caught_fish(fish_simulation):
+    
+    df = generate_df_from_simulation(fish_simulation)
+    
+    fig = px.line(df, x="hour", y="In Trap", line_shape='spline')
+
+    fig.update_traces(text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' for x,y in list(zip(df['day'].values, df['day_hour'].values))],
+                            hovertemplate='%{text}<br>%{y:} fish caught')
+    fig.update_layout(title='Number of Fish Trapped using circular trap model at Comox Harbour',
+                        xaxis_title = 'Time (Days Since Start)',
+                        yaxis_title = 'Number of trapped fish',
+                        xaxis = dict(tickvals = df.day.unique() * 24,
+                                        ticktext = df.day.unique()))
+    
     fig.show()
 
 def plot_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
