@@ -365,7 +365,7 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
     values = run_trap(radius, height, slope, delta, constant_population)
     plot_values(values)
     
-def plot_comox(latitude,longitude):
+def plot_interactive_map(latitude,longitude):
     # Initial coordinates 
     SC_COORDINATES = [latitude, longitude]
 
