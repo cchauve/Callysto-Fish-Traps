@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn
-import os
+import os,sys
 import math
 from typing import List, Tuple
 import plotly.express as px
@@ -24,14 +24,37 @@ def get_tide_values():
     tide_df = tide_df.drop(columns = ['PDT'])
     return tide_df.values.flatten()
 
+
+def print_tide_data(tide_values):
+        result_min = np.where(tide_values == min(tide_values))
+        result_max = np.where(tide_values == max(tide_values))
+        print("The lowest tide reaches", min(tide_values)[0],"meters at",result_min[0][0],"hours")
+        print("The highest tide reaches", max(tide_values)[0],"meters at",result_max[0][0],"hours")
+
 def create_tide_plot(timeframe="week", day=1):
-    """Displays a plot of hourly tide levels for 1 week in May using readings from comox """
-   
+    """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
+    Args:
+    
+    option: a string containing the word 'day' or 'week'
+    if 'day' is passed a plot with a single day tide measurements will be passed
+    if 'week' is passed a plot with a week tide measurements will be passed
+    
+    This function creates an interactive plot indicating min and max tide values,
+    as well as the time when they happened.
+    
+    Raises: ValueError if options not entered correctly
+    """
+
     tide_df = pd.DataFrame(get_tide_values())
     tide_df = tide_df.rename(columns = {0:'tide_level'})
     tide_df['hour'] = tide_df.index
     tide_df["day_hour"] = tide_df["hour"] % 24
     tide_df["day"] = tide_df['hour'] // 24
+    try:
+        timeframe = timeframe.lower()
+        day = round(day)
+    except:
+        raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
 
     if(timeframe == "week"):
         fig = px.line(tide_df, x="hour", y="tide_level", line_shape='spline')
@@ -55,6 +78,7 @@ def create_tide_plot(timeframe="week", day=1):
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
 
     fig.show()
+    print_tide_data(tide_df[["tide_level"]].to_numpy())
 
 def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
@@ -297,7 +321,6 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
 
 def plot_values(values):
     """give the data for the trap, create a plot
-
     Args:
         data_arr is an array of arrays:
             [0]: The total number of harvested fish at hour indexed
@@ -322,7 +345,6 @@ def plot_values(values):
                  xaxis_title="Time(Hours Since Start)")
 
     fig.show()
-
 
 def plot_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
