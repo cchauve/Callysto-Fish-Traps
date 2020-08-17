@@ -6,6 +6,8 @@ import os,sys
 import math
 from typing import List, Tuple
 import plotly.express as px
+import folium
+from folium.plugins import MarkerCluster
 
 # global variables that act as default values for the trap inputs
 default_slope = 0.17
@@ -362,3 +364,23 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
 
     values = run_trap(radius, height, slope, delta, constant_population)
     plot_values(values)
+    
+def plot_comox(latitude,longitude):
+    # Initial coordinates 
+    SC_COORDINATES = [latitude, longitude]
+
+    # Create a map using our initial coordinates
+    map_osm=folium.Map(location=SC_COORDINATES, zoom_start=10, tiles='stamenterrain')
+
+    marker_cluster = MarkerCluster().add_to(map_osm)
+    folium.Marker(location = [SC_COORDINATES[0],SC_COORDINATES[1]], 
+                      # Add tree name
+                      popup=folium.Popup("Comox Valley Harbour",sticky=True),
+                        tooltip='Click here to hide/reveal name',
+                      #Make color/style changes here
+                      icon=folium.Icon(color='red', icon='anchor', prefix='fa'),
+                      # Make sure our trees cluster nicely!
+                      clustered_marker = True).add_to(marker_cluster)
+
+    # Show the map
+    display(map_osm)
