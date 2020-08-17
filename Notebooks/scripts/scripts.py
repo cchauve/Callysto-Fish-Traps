@@ -28,8 +28,8 @@ def get_tide_values():
 def print_tide_data(tide_values):
         result_min = np.where(tide_values == min(tide_values))
         result_max = np.where(tide_values == max(tide_values))
-        print("The lowest tide reaches", min(tide_values)[0],"meters at",result_min[0][0],"hours")
-        print("The highest tide reaches", max(tide_values)[0],"meters at",result_max[0][0],"hours")
+        print("The lowest tide reaches", min(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_min[0][0]%24,"hours")
+        print("The highest tide reaches",max(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_max[0][0]%24,"hours")
 
 def create_tide_plot(timeframe="week", day=1):
     """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
