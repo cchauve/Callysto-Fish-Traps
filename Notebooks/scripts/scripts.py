@@ -319,7 +319,7 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
 
     return [total_harvested, in_trap, out_trap, catches]
 
-def plot_values(values):
+def plot_values(fish_simulation):
     """give the data for the trap, create a plot
     Args:
         data_arr is an array of arrays:
@@ -327,9 +327,8 @@ def plot_values(values):
             [1]: The total number of fish in the trap at hour at hour indexed
             [2]: the total number of fish outside the trap at hour indexed
     """
-    df = pd.DataFrame(values).transpose()
-    df.columns=['Total Harvested', 'In Trap', 'Out of Trap', 'harvest_sizes']
-    df = df.drop(['harvest_sizes'], axis=1)
+    df = pd.DataFrame(fish_simulation)
+    df.columns=['Total Harvested', 'In Trap', 'Out of Trap']
     df['hour'] = df.index
     df['In Area'] = df.apply(lambda x: x['In Trap'] + x['Out of Trap'], axis=1)
     df = df.melt(id_vars=['hour'], value_vars = ['In Trap', 'Out of Trap', 'Total Harvested', 'In Area'])
