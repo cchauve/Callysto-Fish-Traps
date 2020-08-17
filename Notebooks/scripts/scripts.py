@@ -56,7 +56,6 @@ def create_tide_plot(timeframe="week", day=1):
     except:
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
 
-
     if(timeframe == "week"):
         fig = px.line(tide_df, x="hour", y="tide_level", line_shape='spline')
         fig.update_traces(text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
@@ -66,7 +65,7 @@ def create_tide_plot(timeframe="week", day=1):
                     yaxis_title = 'Tide Level (Meters Above Sea Level)',
                     xaxis = dict(tickvals = tide_df.day.unique() * 24,
                                     ticktext = tide_df.day.unique()))
-    
+
     elif(timeframe == "day" and 0 <= day and 6 >= day):
         tide_df = tide_df[tide_df.day == day]
         fig = px.line(tide_df, x="day_hour", y="tide_level", line_shape='spline')
@@ -75,7 +74,6 @@ def create_tide_plot(timeframe="week", day=1):
                     yaxis_title = 'Tide Level (Meters Above Sea Level)')
         fig.update_traces(text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
                         hovertemplate='%{text}<br>%{y:}m above sea-level')
-    
     else:
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
 
