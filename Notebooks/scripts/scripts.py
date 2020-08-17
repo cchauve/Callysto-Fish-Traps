@@ -322,10 +322,14 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
 def plot_values(fish_simulation):
     """give the data for the trap, create a plot
     Args:
-        data_arr is an array of arrays:
-            [0]: The total number of harvested fish at hour indexed
-            [1]: The total number of fish in the trap at hour at hour indexed
-            [2]: the total number of fish outside the trap at hour indexed
+        fish_simulation is a dictionary with three keys for fish which are either harvested, in the trap 
+        and out of the trap, whose values are arrays from our simulation
+        
+    fish_simulation = {"Total harvested fish":current_results[0],
+    "Total fish in the trap":current_results[1],
+    "Total fish outside the trap":current_results[2]}
+    
+    Usage plot_values(fish_simulation)
     """
     df = pd.DataFrame(fish_simulation)
     df.columns=['Total Harvested', 'In Trap', 'Out of Trap']
