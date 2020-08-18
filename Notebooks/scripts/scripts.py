@@ -21,7 +21,7 @@ default_delta = 5
 def get_tide_values():
     """Grabs the tide values measured for one week in comox
     Returns:
-        a dataframe containing measured tide values for comox"""
+        a listcontaining measured tide values for comox"""
 
     tide_path = os.path.join('resources', 'comox_tide.csv')
     tide_df = pd.read_csv(tide_path)
@@ -35,8 +35,8 @@ def print_tide_data(tide_values):
         print("The lowest tide reaches", min(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_min[0][0]%24,"hours")
         print("The highest tide reaches",max(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_max[0][0]%24,"hours")
 
-def create_tide_plot(timeframe="week", day=1, trap_perimeter = None):
-    """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
+def create_tide_plot(timeframe="week", day=0, trap_perimeter=None):
+    """Displays a plot of hourly tide levels for 1 week in May using readings from comox
     Args:
     
     option: a string containing the word 'day' or 'week'
@@ -81,8 +81,6 @@ def create_tide_plot(timeframe="week", day=1, trap_perimeter = None):
     else:
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
     
-    #if(perimeter)
-
     fig.show()
     print_tide_data(tide_df[["tide_level"]].to_numpy())
 
@@ -187,6 +185,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
     perimeter = get_perimeter(radius, height, delta, slope)
+    height_adjustment = min(1, height / 4)
 #TODO
 #check that all the user inputs are within reasonable bounds or throw an error if they are not
     if(len(prev_values) == 0):
@@ -220,7 +219,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
         level = tide_values[len(in_trap) - 1]
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
-        caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
+        caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio * height_adjustment
         current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
         current_free_fish = current_free_fish + caught_to_free - free_to_caught
 
@@ -274,10 +273,6 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
             [3]: list of the size of all harvests
     """
     movement_rate = 0.05
-    #TODO:
-    # Add a new rate out_variable that is dependent on the volume of water in the trap
-    # was looking into: https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.dblquad.html
-    # to calculate the volume but a rough approximation would probably do.
     max_fish = 1000
     current_free_fish = max_fish
     current_caught_fish = 0
@@ -286,6 +281,7 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
     out_trap = [max_fish]
     catches = []
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
+    height_adjustment = min(1, height / 4)
     tide_values = get_tide_values()
    
     perimeter = get_perimeter(radius, height, delta, slope)
@@ -293,9 +289,7 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
     for level in tide_values:
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
         free_to_caught = current_free_fish * coverage * movement_rate * perimeter_ratio
-        #TODO:
-        # the caught_to_free variable should depend on the new calculated variable discussed above
-        caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio
+        caught_to_free = current_caught_fish * coverage * movement_rate * perimeter_ratio * height_adjustment
         current_caught_fish = current_caught_fish - caught_to_free + free_to_caught
         current_free_fish = current_free_fish + caught_to_free - free_to_caught
         
