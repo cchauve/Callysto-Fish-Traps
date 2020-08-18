@@ -35,7 +35,7 @@ def print_tide_data(tide_values):
         print("The lowest tide reaches", min(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_min[0][0]%24,"hours")
         print("The highest tide reaches",max(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_max[0][0]%24,"hours")
 
-def create_tide_plot(timeframe="week", day=1):
+def create_tide_plot(timeframe="week", day=1, trap_perimeter = None):
     """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
     Args:
     
@@ -80,6 +80,8 @@ def create_tide_plot(timeframe="week", day=1):
                         hovertemplate='%{text}<br>%{y:}m above sea-level')
     else:
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
+    
+    #if(perimeter)
 
     fig.show()
     print_tide_data(tide_df[["tide_level"]].to_numpy())
@@ -371,8 +373,6 @@ def plot_values(fish_simulation):
     df = df.melt(id_vars=['hour'], value_vars = ['In Trap', 'Out of Trap', 'Total Harvested', 'In Area'])
     df['value'] = df['value'].round()
     df = df.rename(columns={"value": "fish", "variable": "category"})
-    
-    display(df.head)
 
     fig = px.line(df, x='hour', y='fish', color='category', title="Fish Levels Throughout Harvesting")
 
@@ -413,7 +413,7 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
 
     values = run_trap(radius, height, slope, delta, constant_population)
     
-    ## Build data structure 
+    ## Build data structure
     fish_simulation = {"Total harvested fish":values[0],
                         "Total fish in the trap":values[1],
                         "Total fish outside the trap":values[2]}
@@ -421,7 +421,7 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
     plot_values(fish_simulation)
     
 def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
-    # Initial coordinates 
+    # Initial coordinates
     SC_COORDINATES = [latitude, longitude]
 
     # Create a map using our initial coordinates
