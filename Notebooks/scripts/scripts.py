@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,6 +10,8 @@ import plotly.express as px
 import folium
 from folium.plugins import MarkerCluster
 import plotly.graph_objs as go
+from ipywidgets import interact, interactive, fixed, interact_manual
+import ipywidgets as widgets
 
 
 # global variables that act as default values for the trap inputs
@@ -35,7 +38,7 @@ def print_tide_data(tide_values):
         print("The lowest tide reaches", min(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_min[0][0]%24,"hours")
         print("The highest tide reaches",max(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_max[0][0]%24,"hours")
 
-def create_tide_plot(timeframe="week", day=1, display=True):
+def create_tide_plot(timeframe="week", day=1):
     """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
     Args:
     
@@ -85,10 +88,6 @@ def create_tide_plot(timeframe="week", day=1, display=True):
     else:
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
     
-    
-    if(display):
-        fig.show()
-        print_tide_data(tide_df[["tide_level"]].to_numpy())
     return fig
 
 def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
@@ -387,7 +386,7 @@ def plot_values(fish_simulation):
                   yaxis_title="Number of Fish",
                  xaxis_title="Time(Hours Since Start)")
 
-    return(fig)
+    return fig
     
 def plot_caught_fish(fish_simulation):
     
@@ -403,7 +402,7 @@ def plot_caught_fish(fish_simulation):
                         xaxis = dict(tickvals = df.day.unique() * 24,
                                         ticktext = df.day.unique()))
     
-    fig.show()
+    return fig
 
 def plot_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
@@ -423,7 +422,7 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
                         "Total fish in the trap":values[1],
                         "Total fish outside the trap":values[2]}
     
-    plot_values(fish_simulation)
+    return plot_values(fish_simulation)
     
 def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
     # Initial coordinates
@@ -445,11 +444,15 @@ def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
     # Show the map
     display(map_osm)
 
-def create_tide_plot_grade6(filename = None):
-    fig = create_tide_plot('day', 3, False)
+def create_tide_plot_grade6(radius: int = default_radius, height: float = default_height, delta: int = default_delta,
+                            slope: float = default_slope, intercept: float = default_inter, filename = None,
+                            timeframe='day', day=3):
 
 
-    low_point = min(get_perimeter()[2])
+    fig = create_tide_plot(timeframe, day)
+
+
+    low_point = min(get_perimeter(radius, height, delta, slope, intercept)[2])
 
     fig['data'][0]['showlegend']=True
     fig['data'][0]['name']='Tide Level'
@@ -457,7 +460,7 @@ def create_tide_plot_grade6(filename = None):
     # add line to show low point of the trap
     x = fig['data'][0]['x']
     y = np.full(len(x), low_point)
-    fig.add_scatter(x= x, y= y, name= "low poaint of the trap", hovertemplate=' %{y:.3f}m')
+    fig.add_scatter(x= x, y= y, name= "low point of the trap", hovertemplate=' %{y:.3f}m')
 
     # add text at intersection points
     fig.add_trace(go.Scatter(
@@ -487,4 +490,20 @@ def create_tide_plot_grade6(filename = None):
 
     return(fig)
 
+def run_model_grade6():
+    widgets.interact_manual.opts['manual_name'] = 'Run'
+    r, h, delta, m = 1,1,1,1
+    @widgets.interact_manual(
+        radius= (4, 30), height=(0.4, 3, 0.2), location= (-5, 10), slope= (0.01, 0.2, 0.01))
+    def run(radius=25, height=2, location=5, slope=0.17):
+        fig = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
+        fig['data'][2]['y'] = None
+        fig['data'][2]['x'] = None
+        fig['data'][3]['y'] = None
+        fig['data'][3]['x'] = None
+        fig.show()
+        fig2 = plot_trap(radius, height, slope, delta)
+        total = fig2['data'][2]['y'][-1]
+        fig2.show()
+        print('A total of', total, 'fish were caught')
 
