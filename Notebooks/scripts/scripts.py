@@ -35,14 +35,18 @@ def print_tide_data(tide_values):
         print("The lowest tide reaches", min(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_min[0][0]%24,"hours")
         print("The highest tide reaches",max(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_max[0][0]%24,"hours")
 
-def create_tide_plot(timeframe="week", day=1, trap_perimeter = None):
+def create_tide_plot(timeframe="week", day=1, display=True):
     """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
     Args:
     
-    option: a string containing the word 'day' or 'week'
+    timeframe: a string containing the word 'day' or 'week'
     if 'day' is passed a plot with a single day tide measurements will be passed
     if 'week' is passed a plot with a week tide measurements will be passed
+
+    day: an int between 0 and 6 to select what single day will be displayed if timeframe = 'day'
     
+    display: boolean, if false will return the plotly fig object. If True will display the plot and print high, low tide
+
     This function creates an interactive plot indicating min and max tide values,
     as well as the time when they happened.
     
@@ -81,10 +85,11 @@ def create_tide_plot(timeframe="week", day=1, trap_perimeter = None):
     else:
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
     
-    #if(perimeter)
-
-    fig.show()
-    print_tide_data(tide_df[["tide_level"]].to_numpy())
+    
+    if(display):
+        fig.show()
+        print_tide_data(tide_df[["tide_level"]].to_numpy())
+    return fig
 
 def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
@@ -382,7 +387,7 @@ def plot_values(fish_simulation):
                   yaxis_title="Number of Fish",
                  xaxis_title="Time(Hours Since Start)")
 
-    fig.show()
+    return(fig)
     
 def plot_caught_fish(fish_simulation):
     
@@ -439,3 +444,47 @@ def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
 
     # Show the map
     display(map_osm)
+
+def create_tide_plot_grade6(filename = None):
+    fig = create_tide_plot('day', 3, False)
+
+
+    low_point = min(get_perimeter()[2])
+
+    fig['data'][0]['showlegend']=True
+    fig['data'][0]['name']='Tide Level'
+
+    # add line to show low point of the trap
+    x = fig['data'][0]['x']
+    y = np.full(len(x), low_point)
+    fig.add_scatter(x= x, y= y, name= "low poaint of the trap", hovertemplate=' %{y:.3f}m')
+
+    # add text at intersection points
+    fig.add_trace(go.Scatter(
+        x=[8.2, 19.6],
+        y=[low_point, low_point],
+        mode="markers+text",
+        name="Fish become trapped",
+        text=["Trap Closed", "Trap Closed"],
+        textposition="top right",
+        hovertemplate = 'The water level is now below the trap.<br> This means fish can now be harvested.'
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=[13],
+        y=[low_point],
+        mode="markers+text",
+        name="No fish are trapped",
+        text=["Trap Open"],
+        textposition="top right",
+        hovertemplate = 'The water level is now above the trap.<br> This means fish can swim in and out of it.'
+    ))
+
+    if(isinstance(filename, str)):
+        fig.write_image(filename + ".jpeg")
+    elif(filename is not None):
+        raise(TypeError("filename must be a string"))
+
+    return(fig)
+
+
