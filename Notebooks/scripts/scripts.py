@@ -354,10 +354,6 @@ def generate_df_from_simulation(fish_simulation):
     df['In Trap'] = df['In Trap'].round()
     return df
 
-def plot_caught_fish_vs_tide(fish_simulation):
-    
-    df = generate_df_from_simulation(fish_simulation)
-    
 def plot_values(fish_simulation):
     
     """give the data for the trap, create a plot
@@ -389,7 +385,12 @@ def plot_values(fish_simulation):
     return fig
     
 def plot_caught_fish(fish_simulation):
-    
+    """Creates a plotly object displaying the fish in the trap
+    Args:
+        fish_simulation: a dictionary object showing the fish data to be plotted
+    Returns:
+        fig: a plotly figure object. Use 'fig.show()' to display plotly plot
+    """
     df = generate_df_from_simulation(fish_simulation)
     
     fig = px.line(df, x="hour", y="In Trap", line_shape='spline')
@@ -404,7 +405,7 @@ def plot_caught_fish(fish_simulation):
     
     return fig
 
-def plot_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
+def plot_trap(radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
 
     Args:
@@ -424,7 +425,13 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
     
     return plot_values(fish_simulation)
     
-def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
+def plot_interactive_map(latitude, longitude, tag="Comox Valley Harbour"):
+    """Creates and displays interactive plot of the area surrounnding our trap location.
+        Args:
+            latitude: the latitude of the center of the map
+            longitude: the longtitude of the center of the map
+            tag: the label given to the icon at the center of the map
+    """
     # Initial coordinates
     SC_COORDINATES = [latitude, longitude]
 
@@ -432,7 +439,7 @@ def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
     map_osm=folium.Map(location=SC_COORDINATES, zoom_start=10, tiles='stamenterrain')
 
     marker_cluster = MarkerCluster().add_to(map_osm)
-    folium.Marker(location = [SC_COORDINATES[0],SC_COORDINATES[1]], 
+    folium.Marker(location = [SC_COORDINATES[0],SC_COORDINATES[1]],
                       # Add tree name
                       popup=folium.Popup(tag,sticky=True),
                         tooltip='Click here to hide/reveal name',
@@ -444,13 +451,26 @@ def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
     # Show the map
     display(map_osm)
 
-def create_tide_plot_grade6(radius: int = default_radius, height: float = default_height, delta: int = default_delta,
-                            slope: float = default_slope, intercept: float = default_inter, filename = None,
-                            timeframe='day', day=3):
+def create_tide_plot_grade6(radius= default_radius, height= default_height, delta= default_delta,
+                            slope= default_slope, intercept= default_inter, filename = None,
+                            timeframe= 'day', day= 3):
+    """Create a plot of the tide for a week superimposed with a horizontal line representing the low point of a trap.
+    
+    Args:
+        radius: the radius of the semi-circular trap created
+        height: the height of the trap
+        slope: the slope of the beach
+        delta: how far down the y axis the "center" of the semi-circle is from the origin
+        intercept: the intercept for the eqation of the slope of the beach (y=mx+b)
+        filename: if a string is entered will save the plot with the filename specified
+        timeframe: if 'week' will plot for a week, if 'day' will plot for day specified
+        day: an int between 0 and 6 which speficies the day to be ploted
 
+    Returns:
+        a plotly fig object.
+    """
 
     fig = create_tide_plot(timeframe, day)
-
 
     low_point = min(get_perimeter(radius, height, delta, slope, intercept)[2])
 
@@ -491,19 +511,28 @@ def create_tide_plot_grade6(radius: int = default_radius, height: float = defaul
     return(fig)
 
 def run_model_grade6():
+    """
+        creates widgets allowing user to specify trap parameters then run plotting functions.
+        The four slider widgets createed our:
+            radius, height, location(called delta in other functions), and slope)
+        the two plots created are:
+            a plot of the tide superimposed with the lowest level of the trap
+            a plot showing the dynamics of the fish trap
+    """
     widgets.interact_manual.opts['manual_name'] = 'Run'
-    r, h, delta, m = 1,1,1,1
     @widgets.interact_manual(
         radius= (4, 30), height=(0.4, 3, 0.2), location= (-5, 10), slope= (0.01, 0.2, 0.01))
     def run(radius=25, height=2, location=5, slope=0.17):
         fig = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
+        
+        #lines below disable the annotations included in fig
         fig['data'][2]['y'] = None
         fig['data'][2]['x'] = None
         fig['data'][3]['y'] = None
         fig['data'][3]['x'] = None
+        
         fig.show()
-        fig2 = plot_trap(radius, height, slope, delta)
+        fig2 = plot_trap(radius, height, slope, location)
         total = fig2['data'][2]['y'][-1]
         fig2.show()
-        print('A total of', total, 'fish were caught')
-
+        print('A total of', int(total), 'fish were caught')
