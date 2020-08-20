@@ -39,7 +39,7 @@ def print_tide_data(tide_values):
         print("The highest tide reaches",max(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_max[0][0]%24,"hours")
 
 def create_tide_plot(timeframe="week", day=1):
-    """Displays a plot of hourly tide levels for 1 week in May using readings from comox 
+    """Displays a plot of hourly tide levels for 1 week in May using readings from comox
     Args:
     
     timeframe: a string containing the word 'day' or 'week'
@@ -90,7 +90,7 @@ def create_tide_plot(timeframe="week", day=1):
     
     return fig
 
-def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
+def get_ratio_of_perimeter_covered(tide_level, perimeter,  radius=  25, delta= 5) -> float:
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
 
     Args:
@@ -130,7 +130,7 @@ def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int = 
     coverage  = angle/ (0.5 * np.pi)
     return coverage
 
-def get_perimeter(radius: int = default_radius, height: float = default_height, delta: int = default_delta, slope: float = default_slope, intercept: float = default_inter):
+def get_perimeter(radius= default_radius, height= default_height, delta= default_delta, slope= default_slope, intercept= default_inter):
     """Creates set of points at the top of the semi-circular trap
 
     Args:
@@ -156,7 +156,7 @@ def get_perimeter(radius: int = default_radius, height: float = default_height, 
 
     return [x,y,z]
 
-def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population:bool = True):
+def run_trap_harvesting(prev_values = [], selected_harvest= 0, radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population= True):
     """Runs the model for one harvesting cycle. Where a harvesting cycle is period of time ending in the next low tide in which the trap is closed with fish inside.
     Args:
         prev_values is an array of arrays with:
@@ -260,7 +260,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     return [total_harvested, in_trap, out_trap, catches, True]
 
 
-def run_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
+def run_trap(radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population= True):
     """Runs the fish trap model for 1 week.
     
     Args:
