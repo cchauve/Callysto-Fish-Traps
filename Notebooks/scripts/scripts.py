@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,6 +10,8 @@ import plotly.express as px
 import folium
 from folium.plugins import MarkerCluster
 import plotly.graph_objs as go
+from ipywidgets import interact, interactive, fixed, interact_manual
+import ipywidgets as widgets
 
 
 # global variables that act as default values for the trap inputs
@@ -35,14 +38,18 @@ def print_tide_data(tide_values):
         print("The lowest tide reaches", min(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_min[0][0]%24,"hours")
         print("The highest tide reaches",max(tide_values)[0],"meters on day",result_min[0][0]//24,"at",result_max[0][0]%24,"hours")
 
-def create_tide_plot(timeframe="week", day=0, trap_perimeter=None):
+def create_tide_plot(timeframe="week", day=1):
     """Displays a plot of hourly tide levels for 1 week in May using readings from comox
     Args:
     
-    option: a string containing the word 'day' or 'week'
+    timeframe: a string containing the word 'day' or 'week'
     if 'day' is passed a plot with a single day tide measurements will be passed
     if 'week' is passed a plot with a week tide measurements will be passed
+
+    day: an int between 0 and 6 to select what single day will be displayed if timeframe = 'day'
     
+    display: boolean, if false will return the plotly fig object. If True will display the plot and print high, low tide
+
     This function creates an interactive plot indicating min and max tide values,
     as well as the time when they happened.
     
@@ -80,11 +87,10 @@ def create_tide_plot(timeframe="week", day=0, trap_perimeter=None):
                         hovertemplate='%{text}<br>%{y:}m above sea-level')
     else:
         raise ValueError("kwarg 'timeframe' must be 'day' or 'week'.\n kwarg 'day' must be  between 0-6")
-    
-    fig.show()
-    print_tide_data(tide_df[["tide_level"]].to_numpy())
 
-def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int =  25, delta: int = 5) -> float:
+    return fig
+
+def get_ratio_of_perimeter_covered(tide_level, perimeter,  radius=  25, delta= 5):
     """Given a tide level and points on the perimeter of a semi-circular trap gives the ratio of the trap under water
 
     Args:
@@ -124,7 +130,7 @@ def get_ratio_of_perimeter_covered(tide_level: float, perimeter,  radius: int = 
     coverage  = angle/ (0.5 * np.pi)
     return coverage
 
-def get_perimeter(radius: int = default_radius, height: float = default_height, delta: int = default_delta, slope: float = default_slope, intercept: float = default_inter):
+def get_perimeter(radius= default_radius, height= default_height, delta= default_delta, slope= default_slope, intercept= default_inter):
     """Creates set of points at the top of the semi-circular trap
 
     Args:
@@ -150,7 +156,7 @@ def get_perimeter(radius: int = default_radius, height: float = default_height, 
 
     return [x,y,z]
 
-def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population:bool = True):
+def run_trap_harvesting(prev_values = [], selected_harvest= 0, radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population= True):
     """Runs the model for one harvesting cycle. Where a harvesting cycle is period of time ending in the next low tide in which the trap is closed with fish inside.
     Args:
         prev_values is an array of arrays with:
@@ -185,7 +191,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
     perimeter = get_perimeter(radius, height, delta, slope)
-    height_adjustment = min(1, height / 4)
+    height_adjustment =1 /  min(1, height / 4)
 #TODO
 #check that all the user inputs are within reasonable bounds or throw an error if they are not
     if(len(prev_values) == 0):
@@ -255,7 +261,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest: int = 0, radius: int
     return [total_harvested, in_trap, out_trap, catches, True]
 
 
-def run_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
+def run_trap(radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population= True):
     """Runs the fish trap model for 1 week.
     
     Args:
@@ -281,7 +287,7 @@ def run_trap(radius: int = default_radius, height: float = default_height, slope
     out_trap = [max_fish]
     catches = []
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
-    height_adjustment = min(1, height / 4)
+    height_adjustment = 1 / min(1, height / 4)
     tide_values = get_tide_values()
    
     perimeter = get_perimeter(radius, height, delta, slope)
@@ -344,10 +350,6 @@ def generate_df_from_simulation(fish_simulation):
     df['In Trap'] = df['In Trap'].round()
     return df
 
-def plot_caught_fish_vs_tide(fish_simulation):
-    
-    df = generate_df_from_simulation(fish_simulation)
-    
 def plot_values(fish_simulation):
     
     """give the data for the trap, create a plot
@@ -376,10 +378,15 @@ def plot_values(fish_simulation):
                   yaxis_title="Number of Fish",
                  xaxis_title="Time(Hours Since Start)")
 
-    fig.show()
+    return fig
     
 def plot_caught_fish(fish_simulation):
-    
+    """Creates a plotly object displaying the fish in the trap
+    Args:
+        fish_simulation: a dictionary object showing the fish data to be plotted
+    Returns:
+        fig: a plotly figure object. Use 'fig.show()' to display plotly plot
+    """
     df = generate_df_from_simulation(fish_simulation)
     
     fig = px.line(df, x="hour", y="In Trap", line_shape='spline')
@@ -392,9 +399,9 @@ def plot_caught_fish(fish_simulation):
                         xaxis = dict(tickvals = df.day.unique() * 24,
                                         ticktext = df.day.unique()))
     
-    fig.show()
+    return fig
 
-def plot_trap(radius: int = default_radius, height: float = default_height, slope: float = default_slope, delta: int = default_delta, constant_population: bool = True):
+def plot_trap(radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population: bool = True):
     """Generates a plot for the fish trap operating over 1 week
 
     Args:
@@ -412,9 +419,15 @@ def plot_trap(radius: int = default_radius, height: float = default_height, slop
                         "Total fish in the trap":values[1],
                         "Total fish outside the trap":values[2]}
     
-    plot_values(fish_simulation)
+    return plot_values(fish_simulation)
     
-def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
+def plot_interactive_map(latitude, longitude, tag="Comox Valley Harbour"):
+    """Creates and displays interactive plot of the area surrounnding our trap location.
+        Args:
+            latitude: the latitude of the center of the map
+            longitude: the longtitude of the center of the map
+            tag: the label given to the icon at the center of the map
+    """
     # Initial coordinates
     SC_COORDINATES = [latitude, longitude]
 
@@ -422,7 +435,7 @@ def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
     map_osm=folium.Map(location=SC_COORDINATES, zoom_start=10, tiles='stamenterrain')
 
     marker_cluster = MarkerCluster().add_to(map_osm)
-    folium.Marker(location = [SC_COORDINATES[0],SC_COORDINATES[1]], 
+    folium.Marker(location = [SC_COORDINATES[0],SC_COORDINATES[1]],
                       # Add tree name
                       popup=folium.Popup(tag,sticky=True),
                         tooltip='Click here to hide/reveal name',
@@ -433,3 +446,89 @@ def plot_interactive_map(latitude,longitude,tag="Comox Valley Harbour"):
 
     # Show the map
     display(map_osm)
+
+def create_tide_plot_grade6(radius= default_radius, height= default_height, delta= default_delta,
+                            slope= default_slope, intercept= default_inter, filename = None,
+                            timeframe= 'day', day= 3):
+    """Create a plot of the tide for a week superimposed with a horizontal line representing the low point of a trap.
+    
+    Args:
+        radius: the radius of the semi-circular trap created
+        height: the height of the trap
+        slope: the slope of the beach
+        delta: how far down the y axis the "center" of the semi-circle is from the origin
+        intercept: the intercept for the eqation of the slope of the beach (y=mx+b)
+        filename: if a string is entered will save the plot with the filename specified
+        timeframe: if 'week' will plot for a week, if 'day' will plot for day specified
+        day: an int between 0 and 6 which speficies the day to be ploted
+
+    Returns:
+        a plotly fig object.
+    """
+
+    fig = create_tide_plot(timeframe, day)
+
+    low_point = min(get_perimeter(radius, height, delta, slope, intercept)[2])
+
+    fig['data'][0]['showlegend']=True
+    fig['data'][0]['name']='Tide Level'
+
+    # add line to show low point of the trap
+    x = fig['data'][0]['x']
+    y = np.full(len(x), low_point)
+    fig.add_scatter(x= x, y= y, name= "low point of the trap", hovertemplate=' %{y:.3f}m')
+
+    # add text at intersection points
+    fig.add_trace(go.Scatter(
+        x=[8.2, 19.6],
+        y=[low_point, low_point],
+        mode="markers+text",
+        name="Fish become trapped",
+        text=["Trap Closed", "Trap Closed"],
+        textposition="top right",
+        hovertemplate = 'The water level is now below the trap.<br> This means fish can now be harvested.'
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=[13],
+        y=[low_point],
+        mode="markers+text",
+        name="No fish are trapped",
+        text=["Trap Open"],
+        textposition="top right",
+        hovertemplate = 'The water level is now above the trap.<br> This means fish can swim in and out of it.'
+    ))
+
+    if(isinstance(filename, str)):
+        fig.write_image(filename + ".jpeg")
+    elif(filename is not None):
+        raise(TypeError("filename must be a string"))
+
+    return(fig)
+
+def run_model_grade6():
+    """
+        creates widgets allowing user to specify trap parameters then run plotting functions.
+        The four slider widgets createed our:
+            radius, height, location(called delta in other functions), and slope)
+        the two plots created are:
+            a plot of the tide superimposed with the lowest level of the trap
+            a plot showing the dynamics of the fish trap
+    """
+    widgets.interact_manual.opts['manual_name'] = 'Run'
+    @widgets.interact_manual(
+        radius= (4, 30), height=(0.4, 3, 0.2), location= (-5, 10), slope= (0.01, 0.2, 0.01))
+    def run(radius=25, height=2, location=5, slope=0.17):
+        fig = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
+        
+        #lines below disable the annotations included in fig
+        fig['data'][2]['y'] = None
+        fig['data'][2]['x'] = None
+        fig['data'][3]['y'] = None
+        fig['data'][3]['x'] = None
+        
+        fig.show()
+        fig2 = plot_trap(radius, height, slope, location)
+        total = fig2['data'][2]['y'][-1]
+        fig2.show()
+        print('A total of', int(total), 'fish were caught')
