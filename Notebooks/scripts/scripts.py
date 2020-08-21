@@ -186,7 +186,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest= 0, radius= default_r
         ValueError if harvesting is not a positive integer <= the number of the fish in the trap
     """
 
-    movement_rate = 0.05
+    movement_rate = 0.025
     max_fish = 1000
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     tide_values = get_tide_values()
@@ -278,7 +278,7 @@ def run_trap(radius= default_radius, height= default_height, slope= default_slop
             [2]: the total number of fish outside the trap at hour indexed
             [3]: list of the size of all harvests
     """
-    movement_rate = 0.05
+    movement_rate = 0.025
     max_fish = 1000
     current_free_fish = max_fish
     current_caught_fish = 0
@@ -401,7 +401,7 @@ def plot_caught_fish(fish_simulation):
     
     return fig
 
-def plot_trap(radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population: bool = True):
+def plot_trap(radius= default_radius, height= default_height, slope= default_slope, delta= default_delta, constant_population= True):
     """Generates a plot for the fish trap operating over 1 week
 
     Args:
@@ -515,10 +515,9 @@ def run_model_grade6():
             a plot of the tide superimposed with the lowest level of the trap
             a plot showing the dynamics of the fish trap
     """
-    slope =  widgets.FloatSlider(value=0.17, min=0.01, max=0.2, step=0.01, description="Slope", continuous_update=False)
     radius = widgets.IntSlider(value=25, min=4, max=30, step=1, description="Radius(m)", continuous_update=False)
     height = widgets.FloatSlider(value=2, min=0.4, max=3, step=0.2, description="Height(m)", continuous_update=False)
-    location = widgets.IntSlider(value=5, min=-5, max=10, step=1, description="location(m)", continuous_update=False)
+    location = widgets.IntSlider(value=5, min=-5, max=10, step=1, description="Location(m)", continuous_update=False)
 
     def run(radius=25, height=2, location=5, slope=0.17):
         fig = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
@@ -528,12 +527,18 @@ def run_model_grade6():
         fig['data'][2]['x'] = None
         fig['data'][3]['y'] = None
         fig['data'][3]['x'] = None
-        
         fig.show()
-        fig2 = plot_trap(radius, height, slope, location)
+        
+        fig2 = plot_trap(radius, height, slope, location, False)
         total = fig2['data'][2]['y'][-1]
         fig2.show()
-        print('A total of', int(total), 'fish were caught')
+
+        labels = ['Harvested Fish', 'Surviving Fish in Area']
+        values = [int(total), 1000 - int(total)]
+
+        fig3 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+        fig3.update_layout(title_text="Results of Harvesting")
+        fig3.show()
         
-    out = widgets.interactive_output(run, {'radius': radius, 'height': height, 'location': location, 'slope': slope})
-    display('trap properties:', radius, height, location, out, 'beach properties:', slope)
+    out = widgets.interactive_output(run, {'radius': radius, 'height': height, 'location': location})
+    display(radius, height, location, out)
