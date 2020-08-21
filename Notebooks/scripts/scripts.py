@@ -376,7 +376,9 @@ def plot_values(fish_simulation):
 
     fig.update_layout(hovermode="x",
                   yaxis_title="Number of Fish",
-                 xaxis_title="Time(Hours Since Start)")
+                 xaxis_title="Time(Days Since Start)",
+                 xaxis = dict(tickvals = (df.hour // 24).unique() * 24,
+                              ticktext = (df.hour // 24).unique()))
 
     return fig
     
