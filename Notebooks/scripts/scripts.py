@@ -508,7 +508,7 @@ def create_tide_plot_grade6(radius= default_radius, height= default_height, delt
 
     return(fig)
 
-def run_model_grade6():
+def run_model_grade6(harvesting=True):
     """
         creates widgets allowing user to specify trap parameters then run plotting functions.
         The four slider widgets createed our:
@@ -520,8 +520,9 @@ def run_model_grade6():
     radius = widgets.IntSlider(value=25, min=4, max=30, step=1, description="Radius(m)", continuous_update=False)
     height = widgets.FloatSlider(value=2, min=0.4, max=3, step=0.2, description="Height(m)", continuous_update=False)
     location = widgets.IntSlider(value=5, min=-5, max=10, step=1, description="Location(m)", continuous_update=False)
+    harvesting_percent = widgets.IntSlider(value=100, min=0, max=100, step=10, description="Percent Harvesting", continuous_update=False)
 
-    def run(radius=25, height=2, location=5, slope=0.17):
+    def run(radius=25, height=2, location=5, slope=0.17, harvesting_percent=100):
         fig = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
         
         #lines below disable the annotations included in fig
@@ -530,8 +531,26 @@ def run_model_grade6():
         fig['data'][3]['y'] = None
         fig['data'][3]['x'] = None
         fig.show()
-        
-        fig2 = plot_trap(radius, height, slope, location, False)
+
+        #loop through model cycle by cycle taking a fixed percentage of fish each cycle
+        #this loops is relatively slow but would allow easy modification to allow user to select each harvest individually
+        if(harvesting):
+            flag = False
+            current_results = []
+            selected_harvest = 0
+            
+            while(not flag):
+                current_results = run_trap_harvesting(prev_values = current_results, selected_harvest = selected_harvest, constant_population = False)
+                selected_harvest = math.floor(current_results[1][-1] * (harvesting_percent / 100))
+                flag = current_results[4]
+
+                fish_simulation = {"Total harvested fish":current_results[0],
+                                   "Total fish in the trap":current_results[1],
+                                   "Total fish outside the trap":current_results[2]}
+                fig2 = plot_values(fish_simulation)
+        else:
+            fig2 = plot_trap(radius, height, slope, location, False)
+
         total = fig2['data'][2]['y'][-1]
         fig2.show()
 
@@ -542,5 +561,5 @@ def run_model_grade6():
         fig3.update_layout(title_text="Results of Harvesting")
         fig3.show()
         
-    out = widgets.interactive_output(run, {'radius': radius, 'height': height, 'location': location})
-    display(radius, height, location, out)
+    out = widgets.interactive_output(run, {'radius': radius, 'height': height, 'location': location, 'harvesting_percent': harvesting_percent})
+    display(radius, height, location, out, harvesting_percent)
