@@ -508,6 +508,58 @@ def create_tide_plot_grade6(radius= default_radius, height= default_height, delt
 
     return(fig)
 
+def create_3d_trap(radius, height, delta):
+    h = height
+    r = radius
+
+    plt3d = plt.figure().gca(projection='3d')
+
+    # create x,y
+    xx, yy = np.meshgrid(range(-35, 35), range(-25, 45))
+
+    # calculate corresponding z
+    zz = (delta - (0.17 * yy))
+
+    # plot the surface
+
+    beach_surf = plt3d.plot_surface(xx, yy, zz, alpha=0.2, color = 'brown', label = "beach")
+    # tide_surf equations below get the legend to show
+    beach_surf._facecolors2d=beach_surf._facecolors3d
+    beach_surf._edgecolors2d=beach_surf._edgecolors3d
+
+
+
+    theta = np.linspace(0, np.pi, 100)
+    x = r * np.cos(theta)
+    y = r * np.sin(theta) + delta
+    z = delta + h - (0.17 * y)
+    z2 = delta - (0.17 * y)
+
+    x = np.array(tuple(zip(x, x)))
+    y = np.array(tuple(zip(y, y)))
+    z = np.array(tuple(zip(z, z2)))
+
+    trap_surface = plt3d.plot_surface(x,y,z, label='trap')
+    trap_surface._facecolors2d=trap_surface._facecolors3d
+    trap_surface._edgecolors2d=trap_surface._edgecolors3d
+
+
+    plt3d.set_xlabel('X')
+    plt3d.set_ylabel('Y')
+    plt3d.set_zlabel('Z')
+    plt3d.set_xlim(-35,35)
+    plt3d.set_ylim(-25,45)
+    plt3d.legend()
+    plt3d.set_title('fish trap')
+
+
+    camera_angle = plt3d.azim
+    elev_angle = plt3d.elev
+
+    plt3d.view_init(elev = elev_angle+5, azim = camera_angle+85)
+
+    return(plt3d)
+
 def run_model_grade6(harvesting=True):
     """
         creates widgets allowing user to specify trap parameters then run plotting functions.
@@ -523,6 +575,8 @@ def run_model_grade6(harvesting=True):
     harvesting_percent = widgets.IntSlider(value=100, min=0, max=100, step=10, description="Percent Harvesting", continuous_update=False)
 
     def run(radius=25, height=2, location=5, slope=0.17, harvesting_percent=100):
+        model_3d = create_3d_trap(radius, height, location)
+
         fig = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
         
         #lines below disable the annotations included in fig
@@ -530,7 +584,6 @@ def run_model_grade6(harvesting=True):
         fig['data'][2]['x'] = None
         fig['data'][3]['y'] = None
         fig['data'][3]['x'] = None
-        fig.show()
 
         #loop through model cycle by cycle taking a fixed percentage of fish each cycle
         #this loops is relatively slow but would allow easy modification to allow user to select each harvest individually
@@ -552,14 +605,18 @@ def run_model_grade6(harvesting=True):
             fig2 = plot_trap(radius, height, slope, location, False)
 
         total = fig2['data'][2]['y'][-1]
-        fig2.show()
 
         labels = ['Harvested Fish', 'Surviving Fish in Area']
         values = [int(total), 1000 - int(total)]
 
         fig3 = go.Figure(data=[go.Pie(labels=labels, values=values)])
         fig3.update_layout(title_text="Results of Harvesting")
+     
+        #show the plots
+        plt.show()
+        fig.show()
+        fig2.show()
         fig3.show()
-        
+
     out = widgets.interactive_output(run, {'radius': radius, 'height': height, 'location': location, 'harvesting_percent': harvesting_percent})
     display(radius, height, location, out, harvesting_percent)
