@@ -508,39 +508,72 @@ def create_tide_plot_grade6(radius= default_radius, height= default_height, delt
 
     return(fig)
 
-def run_model_grade6():
-    """
-        creates widgets allowing user to specify trap parameters then run plotting functions.
-        The four slider widgets createed our:
-            radius, height, location(called delta in other functions), and slope)
-        the two plots created are:
-            a plot of the tide superimposed with the lowest level of the trap
-            a plot showing the dynamics of the fish trap
-    """
-    radius = widgets.IntSlider(value=25, min=4, max=30, step=1, description="Radius(m)", continuous_update=False)
-    height = widgets.FloatSlider(value=2, min=0.4, max=3, step=0.2, description="Height(m)", continuous_update=False)
-    location = widgets.IntSlider(value=5, min=-5, max=10, step=1, description="Location(m)", continuous_update=False)
+from plotly.subplots import make_subplots
 
-    def run(radius=25, height=2, location=5, slope=0.17):
-        fig = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
-        
-        #lines below disable the annotations included in fig
-        fig['data'][2]['y'] = None
-        fig['data'][2]['x'] = None
-        fig['data'][3]['y'] = None
-        fig['data'][3]['x'] = None
-        fig.show()
-        
-        fig2 = plot_trap(radius, height, slope, location, False)
-        total = fig2['data'][2]['y'][-1]
-        fig2.show()
+def run(radius=25, height=2, location=5, slope=0.17):
+    
+    var = create_tide_plot_grade6(radius, height, location, slope, timeframe= 'week')
+    var2 = plot_trap(radius, height, slope, location, False)
+    
+    fish_simulation = run_trap(radius= default_radius, 
+         height= height, 
+         slope= slope, 
+         delta= default_delta, 
+         constant_population= False)
 
-        labels = ['Harvested Fish', 'Surviving Fish in Area']
-        values = [int(total), 1000 - int(total)]
+    fish_simulation = {"Total harvested fish":fish_simulation[0],
+        "Total fish in the trap":fish_simulation[1],
+        "Total fish outside the trap":fish_simulation[2]}
+    
+    df = generate_df_from_simulation(fish_simulation)
+    
+    
+    total = var2['data'][2]['y'][-1]
+    labels = ['Harvested Fish', 'Surviving Fish in Area']
+    values = [int(total), 1000 - int(total)]
 
-        fig3 = go.Figure(data=[go.Pie(labels=labels, values=values)])
-        fig3.update_layout(title_text="Results of Harvesting")
-        fig3.show()
+    
+    fig = make_subplots(rows=1, cols=2,specs=[[{"type": "scatter"}, {"type": "pie"}]])
+
+    fig.add_trace(
+        go.Pie(labels=labels, values=values),
+        row=1, col=2
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df["hour"], y=df["In Trap"],name='Fish in Trap'),
+        row=1, col=1
+    )
+    
+    fig.add_trace(
+        go.Scatter(x=df["hour"], y=df["Total Harvested"],name='Total harvested'),
+        row=1, col=1
+    )
+    
+#     fig.add_trace(
+#         go.Scatter(x=df["hour"], y=df["Out of Trap"],name='Fish Out of Trap',fillcolor='blue'),
+#         row=1, col=1
+#     )
+
+    fig.update_layout(height=600, width=800, title_text="Side By Side Subplots")
+    fig.show()
+    
+    
+
+#     #lines below disable the annotations included in fig
+#     fig['data'][2]['y'] = None
+#     fig['data'][2]['x'] = None
+#     fig['data'][3]['y'] = None
+#     fig['data'][3]['x'] = None
+#     fig.show()
+    
+    
+#     fig3 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+#     fig3.update_layout(title_text="Results of Harvesting")
+#     fig3.show()
+
+
+    
+    
         
-    out = widgets.interactive_output(run, {'radius': radius, 'height': height, 'location': location})
-    display(radius, height, location, out)
+    
