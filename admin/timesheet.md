@@ -32,3 +32,13 @@
 | Aug 11 | issue 3                                                        | 4h   | 87.5h      |
 | Aug 12 | issue 3                                                        | 4h   | 91.5h      |
 | Aug 12 | meeting, issue 3                                               | 4h   | 95.5h      |
+| Aug 13 | meeting, updating plots                                        | 4h   | 99.5h      |
+| Aug 15 | Improve plotting                                               | 8h   | 107.5h     |
+| Aug 16 | Switch to plotly                                               | 8h   | 115.5h     |
+| Aug 17 | plotting improvements                                          | 8h   | 123.5h     |
+| Aug 18 | improve model and plots                                        | 7h   | 130.5h     |
+| Aug 19 | improve code clarity add interactive widgets                   | 8h   | 138.5h     |
+| Aug 20 | add pie charts, improve exitsing plots and widgets             | 8h   | 146.5h     |
+| Aug 24 | Add 3d plot                                                    | 5h   | 151.5h     |
+| Aug 26 | Animations                                                     | 3h   | 154.5h     |
+| Aug 27 | meeting and animations                                         |||
