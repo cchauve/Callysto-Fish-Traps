@@ -41,4 +41,5 @@
 | Aug 20 | add pie charts, improve exitsing plots and widgets             | 8h   | 146.5h     |
 | Aug 24 | Add 3d plot                                                    | 5h   | 151.5h     |
 | Aug 26 | Animations                                                     | 3h   | 154.5h     |
-| Aug 27 | meeting and animations                                         |||
+| Aug 27 | meeting and animations                                         | 5h   | 159.5h     |
+| Aug 31 | animations                                                     | 9h   | 168.5h     |
