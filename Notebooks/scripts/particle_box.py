@@ -119,10 +119,10 @@ def init():
     global box, rect
     free_fish.set_data([], [])
     tide.set_data([], [])
-    perimeter.set_data([],[])
+    #perimeter.set_data([],[])
     rect.set_edgecolor('none')
     trapped_fish.set_data([], [])
-    return free_fish, tide, perimeter, rect, trapped_fish
+    return free_fish, tide, rect, trapped_fish
 
 def animate(i):
     """perform animation step"""
@@ -251,4 +251,4 @@ if __name__ == "__main__":
     # http://matplotlib.sourceforge.net/api/animation_api.html
     #ani.save('particle_box.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
 
-    #HTML(ani.to_html5_video())
+    HTML(ani.to_html5_video())
