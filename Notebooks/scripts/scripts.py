@@ -593,7 +593,9 @@ def run_model_grade6(harvesting=True):
             selected_harvest = 0
             
             while(not flag):
-                current_results = run_trap_harvesting(prev_values = current_results, selected_harvest = selected_harvest, constant_population = False)
+                current_results = run_trap_harvesting(prev_values = current_results, selected_harvest = selected_harvest,
+                                                      radius= radius, height= height, slope= slope,
+                                                      delta= location, constant_population = False)
                 selected_harvest = math.floor(current_results[1][-1] * (harvesting_percent / 100))
                 flag = current_results[4]
 
