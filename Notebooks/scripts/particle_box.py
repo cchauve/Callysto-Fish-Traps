@@ -9,6 +9,9 @@ email: vanderplas@astro.washington.edu
 website: http://jakevdp.github.com
 license: BSD
 Please feel free to use and modify this, but keep the above information. Thanks!
+
+Modified by: Bryce Haley, Laura Gutierrez Funderburk
+2020
 """
 import numpy as np
 from scipy.spatial.distance import pdist, squareform, cdist
