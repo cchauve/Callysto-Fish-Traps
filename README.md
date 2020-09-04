@@ -1,4 +1,4 @@
-# Interactive media for fish trap modelling
+# Interactive Notebooks for fish trap modelling
 
 <a href="http://tinyurl.com/y4yya4cg" target="_blank"><img src="https://raw.githubusercontent.com/callysto/curriculum-notebooks/master/open-in-callysto-button.svg?sanitize=true" width="123" height="24" alt="Open in Callysto"/></a>  
 
