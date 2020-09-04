@@ -7,3 +7,5 @@ This project will allow users to "build" a fish trap. The parameters of
 the fish trap built will be fed into a mathematical model and the user
 will then be able to visually see how effective the trap is based on the
 modelling. 
+
+If you wish to use this material, please ensure you are following the terms of this [license](https://github.com/BryceHaley/Callysto-Fish-Traps/blob/master/LICENSE.md).
