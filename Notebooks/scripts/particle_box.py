@@ -134,10 +134,12 @@ def animate(i):
     
     # update pieces of the animation
     rect.set_edgecolor('k')
-    # update high tide line)
+    
+    # update high tide line
     tide.set_data(box.tide_state)
     
-    # update the trap showing
+    # update the trap showing above water
+    # perimiter referes to the perimeter of the trap
     perimeter_arr = box.perimeter.copy()
     mask  = perimeter_arr[1] >= box.bounds[3] - 1
 
@@ -162,17 +164,17 @@ def animate(i):
     free_fish.set_data(np.array(out_df.x), np.array(out_df.y))
     free_fish.set_markersize(ms)
     
+    #let animation freeze after trap is closed
     if box.frozen_iter < 99:
         trapped_fish.set_data(np.array(in_df.x), np.array(in_df.y))
+    # remove caught fish from the trap
     else:
         trapped_fish.set_data([],[])
     trapped_fish.set_markersize(ms)
-    #update patches
+    
+    #update patches (beach and water)
     beach.set_bounds(-2, box.bounds[3], 4, 2-box.bounds[3])
     water.set_bounds(-2, -2, 4, 2+box.bounds[3])
-   # ax.add_patch(beach)
-    #ax.add_patch(water)
-
 
     return free_fish, tide, rect, trapped_fish, perimeter_left, perimeter_right, beach, water
 
