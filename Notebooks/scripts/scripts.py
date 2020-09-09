@@ -193,7 +193,7 @@ def run_trap_harvesting(prev_values = [], selected_harvest= 0, radius= default_r
     perimeter = get_perimeter(radius, height, delta, slope)
     height_adjustment =1 /  min(1, height / 4)
 #TODO
-#check that all the user inputs are within reasonable bounds or throw an error if they are not
+#if allowing users to input arbitrary values check that all the user inputs are within reasonable bounds or throw an error if they are not
     if(len(prev_values) == 0):
         #if the model is just starting
         current_free_fish = max_fish
@@ -289,8 +289,8 @@ def run_trap(radius= default_radius, height= default_height, slope= default_slop
     perimeter_ratio = (np.pi * radius) / (np.pi * 25)
     height_adjustment = 1 / min(1, height / 4)
     tide_values = get_tide_values()
-   
     perimeter = get_perimeter(radius, height, delta, slope)
+    
     #iterated through all tide levels recorded and run the model
     for level in tide_values:
         coverage = get_ratio_of_perimeter_covered(level, perimeter, radius)
@@ -509,41 +509,52 @@ def create_tide_plot_grade6(radius= default_radius, height= default_height, delt
     return(fig)
 
 def create_3d_trap(radius, height, delta):
+    """Creates a 3D surface plot showing the trap and the beach.
+    Args:
+        radius: the radius of the trap
+        height: the height of the trap
+        delta: how far along the beach the center of radius r circle the semicircular trap could be in
+    returns:
+        plt.figure() object
+        """
+
     h = height
     r = radius
 
     plt3d = plt.figure().gca(projection='3d')
 
-    # create x,y
+    # create x,y of the beach
     xx, yy = np.meshgrid(range(-35, 35), range(-25, 45))
 
     # calculate corresponding z
     zz = (delta - (0.17 * yy))
 
-    # plot the surface
-
+    # plot the beach surface
     beach_surf = plt3d.plot_surface(xx, yy, zz, alpha=0.2, color = 'brown', label = "beach")
-    # tide_surf equations below get the legend to show
+   
+   # tide_surf equations below get the legend to show
     beach_surf._facecolors2d=beach_surf._facecolors3d
     beach_surf._edgecolors2d=beach_surf._edgecolors3d
 
 
-
+    # find data for the points on the trap on top of the beach points
     theta = np.linspace(0, np.pi, 100)
     x = r * np.cos(theta)
     y = r * np.sin(theta) + delta
     z = delta + h - (0.17 * y)
     z2 = delta - (0.17 * y)
-
+    
+    # reformat points for output
     x = np.array(tuple(zip(x, x)))
     y = np.array(tuple(zip(y, y)))
     z = np.array(tuple(zip(z, z2)))
-
+    
+    # plot the trap
     trap_surface = plt3d.plot_surface(x,y,z, label='trap')
     trap_surface._facecolors2d=trap_surface._facecolors3d
     trap_surface._edgecolors2d=trap_surface._edgecolors3d
 
-
+    #format legend
     plt3d.set_xlabel('X')
     plt3d.set_ylabel('Y')
     plt3d.set_zlabel('Z')
@@ -552,7 +563,8 @@ def create_3d_trap(radius, height, delta):
     plt3d.legend()
     plt3d.set_title('fish trap')
 
-
+    #adjust the viewing angle of the plot
+    #DO NOT change notebook to allow dynamic matplotlib (VERY LAGGY)
     camera_angle = plt3d.azim
     elev_angle = plt3d.elev
 
