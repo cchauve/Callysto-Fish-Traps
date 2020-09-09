@@ -10,8 +10,9 @@ import plotly.express as px
 import folium
 from folium.plugins import MarkerCluster
 import plotly.graph_objs as go
-from ipywidgets import interact, interactive, fixed, interact_manual
 import ipywidgets as widgets
+from ipywidgets import interact, interact_manual, widgets, Layout, VBox, HBox, Button,fixed,interactive
+from IPython.display import display, Javascript, Markdown, HTML, clear_output
 
 
 # global variables that act as default values for the trap inputs
@@ -20,6 +21,7 @@ default_inter = 6
 default_radius = 25
 default_height = 2
 default_delta = 5
+max_fish = 1000
 
 def get_tide_values():
     """Grabs the tide values measured for one week in comox
@@ -279,7 +281,6 @@ def run_trap(radius= default_radius, height= default_height, slope= default_slop
             [3]: list of the size of all harvests
     """
     movement_rate = 0.025
-    max_fish = 1000
     current_free_fish = max_fish
     current_caught_fish = 0
     total_harvested = [0]
@@ -634,3 +635,277 @@ def run_model_grade6(harvesting=True):
 
     out = widgets.interactive_output(run, {'radius': radius, 'height': height, 'location': location, 'harvesting_percent': harvesting_percent})
     display(radius, height, location, out, harvesting_percent)
+    
+    
+from plotly.subplots import make_subplots
+
+def run_ui_updated(radius, height, location,harvesting_percent):
+    
+    # Tide 
+    tide_df = pd.DataFrame(get_tide_values())
+    tide_df = tide_df.rename(columns = {0:'tide_level'})
+    tide_df['hour'] = tide_df.index
+    tide_df["day_hour"] = tide_df["hour"] % 24
+    tide_df["day"] = tide_df['hour'] // 24
+    
+
+    # Trap 
+    delta= location
+    slope= default_slope
+    intercept= default_inter
+    low_point = min(get_perimeter(radius, height, delta, slope, intercept)[2])
+    
+    # Harvesting fish
+    harvesting=True
+    
+    if(harvesting):
+        flag = False
+        current_results = []
+        selected_harvest = 0
+
+        while(not flag):
+            
+            current_results = run_trap_harvesting(current_results, selected_harvest,
+                                                      radius, height, slope,
+                                                      location, False)
+            selected_harvest = math.floor(current_results[1][-1] * (harvesting_percent / 100))
+            flag = current_results[4]
+
+    # Build DF
+    fish_simulation = {"Total harvested fish":current_results[0],
+        "Total fish in the trap":current_results[1],
+        "Total fish outside the trap":current_results[2]}
+
+    df = generate_df_from_simulation(fish_simulation)
+
+
+    # 
+    fig2 = plot_values(fish_simulation)
+        
+
+    total = fig2['data'][2]['y'][-1]
+
+    labels = ['Harvested Fish', 'Surviving Fish in Area']
+    values = [int(total), 1000 - int(total)]
+    # add line to show low point of the trap
+    x = df["hour"]
+    y = np.full(len(x), low_point)
+    
+    ##################
+    #Plotting
+    
+    survivor_colors = ['rgb(33, 75, 99)', 'rgb(79, 129, 102)', 'rgb(151, 179, 100)','rgb(175, 49, 35)']
+    
+    fig = make_subplots(rows=1, cols=4,specs=[[{"type": "scatter"},{"type": "scatter"},{"type": "scatter"}, {"type": "pie"}]])
+
+    ### TIDE 
+
+    low_point = min(get_perimeter(radius, height, delta, slope, intercept)[2])
+
+    
+    fig.add_trace(
+        go.Scatter(x=tide_df["hour"], y=tide_df["tide_level"],name="Weekly Tide",
+                   text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
+                           for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+                        hovertemplate='%{text}<br>%{y:}m above sea-level'),
+                 row=1, col=1
+                 )
+    
+     # add line to show low point of the trap
+    fig.add_trace(
+        go.Scatter(x=df["hour"], y=np.full(len(x), low_point),name='low point of the trap',
+                  hovertemplate=' %{y:.3f}m'),
+        row=1, col=1
+    )
+    
+    # FISH SIMULATION
+     
+        
+    fig.add_trace(
+        go.Scatter(x=df["hour"], y=df["In Trap"],mode='markers',name='Fish In Trap',
+                   marker_color=survivor_colors[2],
+                  text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
+                           for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+                        hovertemplate='%{text}<br>%{y:} Fish'),
+        row=1, col=2
+    )
+    
+    fig.add_trace(
+        go.Scatter(x=df["hour"], y=df["Out of Trap"],mode='markers',name='Fish Out of Trap',
+                   marker_color=survivor_colors[1 ],
+                  text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
+                           for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+                        hovertemplate='%{text}<br>%{y:} Fish'),
+        row=1, col=2)
+    
+    # Cumulative harvested fish
+    
+    fig.add_trace(
+        go.Scatter(x=df["hour"], y=df["Total Harvested"],mode='lines+markers',
+                   name='(Cumulative) Total Harvested',
+                   marker_color=survivor_colors[0],
+                  text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
+                           for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+                        hovertemplate='%{text}<br>%{y:} Fish'),
+        row=1, col=3
+    )
+    
+    
+    # SURVIVOR VS HARVESTED
+    
+
+    fig.add_trace(
+        go.Pie(labels=labels, values=values, name='Survivors vs Harvested Fish',
+                     marker_colors=survivor_colors[0:2]),
+        row=1, col=4,
+    )
+    
+    
+    fig.update_layout(height=600, width=950, title_text="Fish Trap Simulation",showlegend=True)
+    fig.show()
+    
+    
+def create_3d_trap(radius, height, delta):
+    """This function creates a 3D plot of the beach along with our trap
+    
+    Args:
+        radius (int): radius of trap
+        height (int): height of trap
+        delta (int): location of trap
+
+    Returns:
+        A 3D plot of the trap 
+    """ 
+    h = height
+    r = radius
+
+    plt3d = plt.figure(figsize=(10,10)).gca(projection='3d')
+
+    # create x,y
+    xx, yy = np.meshgrid(range(-35, 35), range(-25, 45))
+
+    # calculate corresponding z
+    zz = (delta - (0.17 * yy))
+
+    # plot the surface
+
+    beach_surf = plt3d.plot_surface(xx, yy, zz, alpha=0.2, color = 'brown', label = "beach")
+    # tide_surf equations below get the legend to show
+    beach_surf._facecolors2d=beach_surf._facecolors3d
+    beach_surf._edgecolors2d=beach_surf._edgecolors3d
+
+
+
+    theta = np.linspace(0, np.pi, 100)
+    x = r * np.cos(theta)
+    y = r * np.sin(theta) + delta
+    z = delta + h - (0.17 * y)
+    z2 = delta - (0.17 * y)
+
+    x = np.array(tuple(zip(x, x)))
+    y = np.array(tuple(zip(y, y)))
+    z = np.array(tuple(zip(z, z2)))
+
+    trap_surface = plt3d.plot_surface(x,y,z, label='trap')
+    trap_surface._facecolors2d=trap_surface._facecolors3d
+    trap_surface._edgecolors2d=trap_surface._edgecolors3d
+
+
+    plt3d.set_xlabel('X')
+    plt3d.set_ylabel('Y')
+    plt3d.set_zlabel('Z')
+    plt3d.set_xlim(-35,35)
+    plt3d.set_ylim(-25,45)
+    plt3d.legend()
+    plt3d.set_title('fish trap')
+
+
+    camera_angle = plt3d.azim
+    elev_angle = plt3d.elev
+
+    plt3d.view_init(elev = elev_angle+5, azim = camera_angle+85)
+
+    return(plt3d)
+
+def draw_results(b):
+    radius = all_the_widgets[0].value
+    height = all_the_widgets[1].value
+    location = all_the_widgets[2].value
+    harvesting_percentage = all_the_widgets[3].value
+    beach_flag = all_the_widgets[4].value
+    clear_output()
+    display(tab)  ## Have to redraw the widgets
+    if beach_flag:
+        create_3d_trap(radius, height, location)
+    else:
+        run_ui_updated(radius, height, location,harvesting_percentage)
+
+
+if __name__ == "__main__":
+
+    style = {'description_width': 'initial'}
+
+    all_the_widgets = [widgets.IntSlider(
+        value=25, 
+        min=4, 
+        max=30, 
+        step=1, 
+        description="Radius of trap(m)", 
+        continuous_update=False,
+        style =style), widgets.FloatSlider(
+        value=2, 
+        min=0.4, 
+        max=3, 
+        step=0.2, 
+        description="Heightof trap(m)", 
+        continuous_update=False,
+        style =style), widgets.IntSlider(
+        value=5, 
+        min=-5, 
+        max=10, 
+        step=1, 
+        description="Location of trap(m)", 
+        continuous_update=False,
+        style =style),widgets.IntSlider(
+                value=10,
+                min=0,
+                max=100,
+                step=1,
+                description='Harvesting percentage',
+                disabled=False,
+                continuous_update=False,
+                orientation='horizontal',
+                readout=True,
+                style =style),widgets.Checkbox(
+                value=False,
+                description='Plot 3D Beach Only',
+                disabled=False,
+                indent=False,style =style)
+                      ]
+
+
+    # Button widget
+    CD_button = widgets.Button(
+        button_style='success',
+        description="Fish Trap Simulation", 
+        layout=Layout(width='15%', height='30px'),
+        style=style
+    )
+    
+    # Button widget
+    beach3d_button = widgets.Button(
+        button_style='success',
+        description="Draw Trap", 
+        layout=Layout(width='15%', height='30px'),
+        style=style
+    )
+
+    # Connect widget to function - run subsequent cells
+    CD_button.on_click( draw_results )
+
+    # user menu using categories found above
+    tab3 = VBox(children=[HBox(children=all_the_widgets[0:2]),HBox(children=all_the_widgets[2:5]),
+                          CD_button])
+    tab = widgets.Tab(children=[tab3])
+    tab.set_title(0, 'Choose Parameters')
+   
