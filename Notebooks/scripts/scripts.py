@@ -1,3 +1,12 @@
+# Authors: Bryce Haley, Laura Gutierrez Funderburk
+# Created on June 2020
+# Last modified on Sept 18 2020
+
+"""
+This script contains functions whose goal is to model Coast Salish Fish Traps
+
+"""
+
 from __future__ import print_function
 import numpy as np
 import pandas as pd
