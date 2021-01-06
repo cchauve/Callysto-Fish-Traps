@@ -840,8 +840,8 @@ def draw_results(b):
     radius = all_the_widgets[0].value
     height = all_the_widgets[1].value
     location = all_the_widgets[2].value
-    harvesting_percentage = all_the_widgets[3].value
-    beach_flag = all_the_widgets[4].value
+    harvesting_percentage = 74
+    beach_flag = all_the_widgets[3].value
     clear_output()
     display(tab)  ## Have to redraw the widgets
     if beach_flag:
@@ -875,17 +875,7 @@ if __name__ == "__main__":
         step=1, 
         description="Location of trap(m)", 
         continuous_update=False,
-        style =style),widgets.IntSlider(
-                value=10,
-                min=0,
-                max=100,
-                step=1,
-                description='Harvesting percentage',
-                disabled=False,
-                continuous_update=False,
-                orientation='horizontal',
-                readout=True,
-                style =style),widgets.Checkbox(
+        style =style),widgets.Checkbox(
                 value=False,
                 description='Plot 3D Beach Only',
                 disabled=False,
