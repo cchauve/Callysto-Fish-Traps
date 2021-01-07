@@ -706,7 +706,7 @@ def run_ui_updated(radius, height, location,harvesting_percent):
     survivor_colors = ['rgb(33, 75, 99)', 'rgb(79, 129, 102)', 'rgb(151, 179, 100)','rgb(175, 49, 35)']
     
     #fig = make_subplots(rows=1, cols=4,specs=[[{"type": "scatter"},{"type": "scatter"},{"type": "scatter"}, {"type": "pie"}]])
-    fig = make_subplots(rows=1, cols=4,specs=[[{"type": "scatter"}, {"type": "pie"}]])
+    fig = make_subplots(rows=1, cols=2,specs=[[{"type": "scatter"}, {"type": "pie"}]])
     
     ### TIDE 
 
