@@ -1,6 +1,9 @@
 # Interactive Notebooks for fish trap modelling
 
-<a href="http://tinyurl.com/y4yya4cg" target="_blank"><img src="https://raw.githubusercontent.com/callysto/curriculum-notebooks/master/open-in-callysto-button.svg?sanitize=true" width="123" height="24" alt="Open in Callysto"/></a>  
+<a href="http://tinyurl.com/y4yya4cg" target="_blank"><img src="https://raw.githubusercontent.com/callysto/curriculum-notebooks/master/open-in-callysto-button.svg?sanitize=true" width="123" height="24" alt="Open in Callysto"/></a> Part I: Parameters Northern Coast Salish fish traps
+
+<a href="https://tinyurl.com/y3glsqrb" target="_blank"><img src="https://raw.githubusercontent.com/callysto/curriculum-notebooks/master/open-in-callysto-button.svg?sanitize=true" width="123" height="24" alt="Open in Callysto"/></a> Part II: Impact of greedy harvesting on pink salmon populations
+
 
 To launch this notebook using the Callysto hub, press the button above.
 ______________
