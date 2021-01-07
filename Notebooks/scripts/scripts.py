@@ -840,7 +840,7 @@ def draw_results(b):
     radius = all_the_widgets[0].value
     height = all_the_widgets[1].value
     location = all_the_widgets[2].value
-    harvesting_percentage = 74
+    harvesting_percentage = 100
     beach_flag = all_the_widgets[3].value
     clear_output()
     display(tab)  ## Have to redraw the widgets
