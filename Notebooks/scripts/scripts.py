@@ -750,7 +750,7 @@ def run_ui_updated(radius, height, location,harvesting_percent):
     # Cumulative harvested fish
     
     fig.add_trace(
-        go.Scatter(x=df["hour"], y=df["Total Harvested"],mode='lines+markers',
+        go.Scatter(x=df["hour"], y=df["Total Harvested"],mode='markers',
                    name='(Cumulative) Total Harvested',
                    marker_color=survivor_colors[0],
                   text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
