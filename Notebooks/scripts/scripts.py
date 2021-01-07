@@ -767,7 +767,7 @@ def run_ui_updated(radius, height, location,harvesting_percent):
     fig.add_trace(
         go.Pie(labels=labels, values=values, name='Survivors vs Harvested Fish',
                      marker_colors=survivor_colors[0:2]),
-        row=1, col=4,
+        row=1, col=2, # Change to 4 if uncommenting the code above
     )
     
     
