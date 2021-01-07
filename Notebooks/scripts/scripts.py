@@ -705,8 +705,9 @@ def run_ui_updated(radius, height, location,harvesting_percent):
     
     survivor_colors = ['rgb(33, 75, 99)', 'rgb(79, 129, 102)', 'rgb(151, 179, 100)','rgb(175, 49, 35)']
     
-    fig = make_subplots(rows=1, cols=4,specs=[[{"type": "scatter"},{"type": "scatter"},{"type": "scatter"}, {"type": "pie"}]])
-
+    #fig = make_subplots(rows=1, cols=4,specs=[[{"type": "scatter"},{"type": "scatter"},{"type": "scatter"}, {"type": "pie"}]])
+    fig = make_subplots(rows=1, cols=4,specs=[[{"type": "scatter"}, {"type": "pie"}]])
+    
     ### TIDE 
 
     low_point = min(get_perimeter(radius, height, delta, slope, intercept)[2])
@@ -730,34 +731,34 @@ def run_ui_updated(radius, height, location,harvesting_percent):
     # FISH SIMULATION
      
         
-    fig.add_trace(
-        go.Scatter(x=df["hour"], y=df["In Trap"],mode='markers',name='Fish In Trap',
-                   marker_color=survivor_colors[2],
-                  text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
-                           for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
-                        hovertemplate='%{text}<br>%{y:} Fish'),
-        row=1, col=2
-    )
+#     fig.add_trace(
+#         go.Scatter(x=df["hour"], y=df["In Trap"],mode='markers',name='Fish In Trap',
+#                    marker_color=survivor_colors[2],
+#                   text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
+#                            for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+#                         hovertemplate='%{text}<br>%{y:} Fish'),
+#         row=1, col=2
+#     )
     
-    fig.add_trace(
-        go.Scatter(x=df["hour"], y=df["Out of Trap"],mode='markers',name='Fish Out of Trap',
-                   marker_color=survivor_colors[1 ],
-                  text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
-                           for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
-                        hovertemplate='%{text}<br>%{y:} Fish'),
-        row=1, col=2)
+#     fig.add_trace(
+#         go.Scatter(x=df["hour"], y=df["Out of Trap"],mode='markers',name='Fish Out of Trap',
+#                    marker_color=survivor_colors[1 ],
+#                   text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
+#                            for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+#                         hovertemplate='%{text}<br>%{y:} Fish'),
+#         row=1, col=2)
     
     # Cumulative harvested fish
     
-    fig.add_trace(
-        go.Scatter(x=df["hour"], y=df["Total Harvested"],mode='markers',
-                   name='(Cumulative) Total Harvested',
-                   marker_color=survivor_colors[0],
-                  text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
-                           for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
-                        hovertemplate='%{text}<br>%{y:} Fish'),
-        row=1, col=3
-    )
+#     fig.add_trace(
+#         go.Scatter(x=df["hour"], y=df["Total Harvested"],mode='markers',
+#                    name='(Cumulative) Total Harvested',
+#                    marker_color=survivor_colors[0],
+#                   text= [f'<b>Day</b>: {x}<br><b>Hour</b>: {y}' \
+#                            for x,y in list(zip(tide_df['day'].values, tide_df['day_hour'].values))],
+#                         hovertemplate='%{text}<br>%{y:} Fish'),
+#         row=1, col=3
+#     )
     
     
     # SURVIVOR VS HARVESTED
