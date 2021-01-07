@@ -5,7 +5,7 @@
 <a href="https://tinyurl.com/y3glsqrb" target="_blank"><img src="https://raw.githubusercontent.com/callysto/curriculum-notebooks/master/open-in-callysto-button.svg?sanitize=true" width="123" height="24" alt="Open in Callysto"/></a> Part II: Impact of greedy harvesting on pink salmon populations
 
 
-To launch this notebook using the Callysto hub, press the buttons above.
+To launch either notebook using the Callysto hub, press any of the buttons above.
 ______________
 
 ### Authors: Cedric Chauve, Laura Gutierrez Funderburk, Bryce Haley, Veselin Jungic
