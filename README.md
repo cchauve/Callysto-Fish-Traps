@@ -8,8 +8,6 @@
 To launch this notebook using the Callysto hub, press the buttons above.
 ______________
 
-#### This is the second project of this type the first being a notebook on  [Coast Salish Basket Motifs](https://github.com/cchauve/Callysto-Salish-Baskets)
-
 ### Authors: Cedric Chauve, Laura Gutierrez Funderburk, Bryce Haley, Veselin Jungic
 
 This project will allow users to "build" a fish trap. The parameters of
@@ -19,3 +17,5 @@ modelling. We then evaluate the relationship between quota (how much fish
 to harvest) vs population size for pink salmon over the course of 10 years.
 
 If you wish to use this material, please ensure you are following the terms of this [license](https://github.com/BryceHaley/Callysto-Fish-Traps/blob/master/LICENSE.md).
+
+Related notebooks: [Coast Salish Basket Motifs](https://github.com/cchauve/Callysto-Salish-Baskets)
